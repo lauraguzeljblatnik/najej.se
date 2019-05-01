@@ -14,164 +14,101 @@ frontpage_filename = "recepti_data.html"
 #the filename for the csv file for the extracted data
 csv_filename = "recepti_data.csv"
 
+head = ['Ime', 'Opis recepta', 'Uporabnik',
+        'Datum','ID recepta', 'Priložnost', 'Priprava', 'Sezona',
+        'Vrsta jedi', 'Čas priprave', 'Sestavine', 'Postopek']
 
-#getting data from the web
-
-def download_url_to_string(url, i):
-    '''This funtion takes a url as argument and tries to download
-          it using requests. Upon success, it returns the page
-          contents as string'''
-    url += str(i)
-    webpage = requests.get(url)
-    if webpage.ok:
-        webpage_text = webpage.text
-    else:
-        webpage_text = "Unable"
-    return webpage_text
-
-def save_string_to_file(text, directory, filename):
-    '''This function writes "text" to file "filename" located in directory
-       "directory". IF ""rrrrf" is the empty string, use the
-       current directory.'''
-    os.makedirs(directory, exist_ok=True)
-    path = os.path.join(directory, filename)
-    with open(path, 'w', encoding='utf-8') as file_out:
-        file_out.write(text)
-    return None
-
-
-
-
-
-
-
-#processing data
-
-def read_file_to_string(directory, filename):
-    '''This function returns the contents of the file as string'''
-    path =os.path.join(directory, filename)
-    with open(path, 'r') as file_in:
-        return file_in.read
-
-#KAJ JE TREBA POPRAVIT:
-    # ne najde opisa - update: ker ga ni!, a ga dava ven?
-    #ime in avtorja rudi grdo dobi, kaj je s temi b-ji :(
-    #če neke stvari ni, potem je problem! npr priložnost, opis,...
-    #kakšno je to kodiranje to, nič ne dela :(
-    
-    
-    
-
-
-def split_text_to_prod(text):
-    pattern = re.compile(
-                        r'<span class="trenutno">(?P<ime>.*?)</span></p>'
-                        r'.*?'
-##                        r'<p class="podnaslov" itemprop="description">(?P<opis>.*?)</p>'
-##                        r'.*?'
-                        r'<span itemprop=.author.>(?P<avtor>.*?)</span>'
-                        r'.*?'
-                        r'<span class=.after1. itemprop=.datePublished.>(?P<datum>.*?)</span>'
-                        r'.*?'
-                        r'<span class=.after1.>ID recepta: (?P<ID>.*?)</span>'
-                        r'.*?'
-##                        r'<span class=.after1.>priložnost:(?P<priložnost>.*?)</span>'
-##                        r'.*?'
-##                        r'<span class=.after1.>priprava:(?P<priprava>.*?)</span>'
-##                        r'.*?'
-##                        r'<span class=.after1.>sezona:(?P<sezona>.*?)</span>'
-##                        r'.*?'
-##                        r'<span class=.after1.>vrsta jedi:(?P<vrsta>.*?)</span>'
-##                        r'.*?'
-##                        r'<span class=.cas.>(?P<čas>.*?)</span>'
-##                        r'.*?'
-                        r'<p class="cf" itemprop="recipeIngredient"><span class="label"></span><span class="label-value">(?P<sestavine>.*?)</div>'
-                        r'.*?'
-                        r'<div id="receptPostopek"><h2>Postopek</h2>(?P<postopek>.*?)</div>'
-                        ,re.DOTALL)
-    listt =[]
-    for pat in re.finditer(pattern, text):
-        listt += [[ pat.group('ID'),
-                   str(pat.group('ime').encode('utf-8')),
-##                   str(pat.group('opis').encode('utf-8')),
-                   str(pat.group('avtor').encode('utf-8')),
-                   str(pat.group('datum').encode('utf-8')),
-##                   str(pat.group('priložnost').encode('utf-8')),
-##                   str(pat.group('priprava').encode('utf-8')),
-##                   str(pat.group('sezona').encode('utf-8')),
-##                   str(pat.group('vrsta').encode('utf-8')),
-##                   str(pat.group('čas').encode('utf-8')),
-                   str(pat.group('sestavine').encode('utf-8')),
-                   str(pat.group('postopek').encode('utf-8'))
-            ]]
-    return listt
-
-
-
-def all_data(url):
-    data = []
-    for i in range(1,10):
-        text = download_url_to_string(url, i)
-        data += split_text_to_prod(text)
-    return data
-
-
-def convert_to_csv(info, head, name):
-    with open(name,'w') as csvFile:
-        csvFile.write(head)
-        for line in info:
-            csvFile.write(','.join(line) + '\n')
-    csvFile.close()
-
-
-head = "Ime, Opis recepta, Uporabnik, Datum, ID recepta, Priložnost, Priprava, Sezona, Vrsta jedi, Čas priprave, Sestavine, Postopek"
-
-#Klicanje funkcij
-#text = download_url_to_string(recepti_frontpage_url, 1)
-#print(text)
-#save_string_to_file(text, recepti_directory, frontpage_filename)
-#data = all_data(recepti_frontpage_url)
-#print(data)
-#convert_to_csv(data,head,csv_filename)
- 
 #poskusimo z beautifulsoup
-f = csv.writer(open(csv_filename, 'w'))
-f.writerow(head)
-
-pages = []
-
-for i in range(1,5):
-    url = recepti_frontpage_url + str(i)
-    pages.append(url)
-
-for i in range(20689,20692):
-    url = recepti_frontpage_url + str(i)
-    pages.append(url)
+with open(csv_filename, 'w', encoding='utf-8') as csvfile:
+    pisalec_receptov = csv.writer(csvfile,delimiter=',')
+    pisalec_receptov.writerow(head)
 
 
-for item in pages:
-    page = requests.get(item)
-    if page.ok:
-        soup = BeautifulSoup(page.text, 'html.parser')
-        if soup.find('h1', itemprop="name"):
-            ime = soup.find('h1', itemprop="name").text.strip()
-        print(ime)
-        if soup.find ('p', itemprop="description"):
-            opis = soup.find ('p', itemprop="description").text.strip()
-        print(opis)
-        if soup.find('span', itemprop='author'):
-            avtor = soup.find('span', itemprop='author').text.strip()
-        print(avtor)
-        if soup.find('span', itemprop='datePublished'):
-            datum = soup.find('span', itemprop='datePublished').text.strip()
-        print(datum)
-        
-        
-        
-        
-        #f.writerow([podatki]) #v podatke daš stvari kot so v head, pomagaj si z
-                                    #https://www.digitalocean.com/community/tutorials/how-to-scrape-web-pages-with-beautiful-soup-and-python-3
+    pages = []
 
-    else:
-        webpage_text = "Unable"
+    #for i in range(1,513):
+     #   url = recepti_frontpage_url + str(i)
+     #   pages.append(url)
 
+    for i in range(1,21964):
+        url = recepti_frontpage_url + str(i)
+        pages.append(url)
+
+
+    for item in pages:
+        page = requests.get(item)
+        if page.ok and page.url != 'https://www.kulinarika.net/napaka/?error=1':
+            #print(' ')
+            soup = BeautifulSoup(page.text, 'html.parser')
+            if soup.find('h1', itemprop="name"):
+                ime = soup.find('h1', itemprop="name").text.strip()
+            #print(ime)
+
+            if soup.find ('p', itemprop="description"):
+                opis = soup.find ('p', itemprop="description").text.strip()
+            #print(opis)
+
+            if soup.find('span', itemprop='author'):
+                avtor = soup.find('span', itemprop='author').text.strip()
+            #print(avtor)
+
+            if soup.find('span', itemprop='datePublished'):
+                datum = soup.find('span', itemprop='datePublished').text.strip()
+            #print(datum)
+
+            ID1 = soup.find('span', string=re.compile("ID recepta: (\d+)")).text.strip()
+            ID = int(re.search(r'\d+', ID1).group())
+            #print(ID)
+
+            if soup.find('span', string=re.compile("priložnost: .+")):
+                pril = soup.find('span', string=re.compile("priložnost: .+")).text.strip()
+                priloznost = re.search(r': (.*)', pril).group(1)
+                #print(priloznost)
+            else:
+                priloznost = None
+            
+
+            if soup.find('span', string=re.compile("priprava: .+")):
+                prip = soup.find('span', string=re.compile("priprava: .+")).text.strip()
+                nacin = re.search(r': (.*)', prip).group(1)
+                #print(nacin)
+            else:
+                nacin = None
+
+            if soup.find('span', string=re.compile("sezona: .+")):
+                sez = soup.find('span', string=re.compile("sezona: .+")).text.strip()
+                sezona = re.search(r': (.*)', sez).group(1)
+                #print(sezona)
+            else:
+                sezona = None
+
+            if soup.find('span', string=re.compile("vrsta jedi: .+")):
+                vr = soup.find('span', string=re.compile("vrsta jedi: .+")).text.strip()
+                vrsta = re.search(r': (.*)', vr).group(1)
+                #print(vrsta)
+            else:
+                vrsta = None
+
+            if soup.find('span', class_='cas'):
+                cas = soup.find('span', class_='cas').text.strip()
+            #print(cas)
+
+            if soup.find('p', itemprop="recipeInstructions"):
+                priprava = ''
+                p = soup.find_all('p', itemprop="recipeInstructions")
+                for el in p:
+                    priprava += el.text.strip()
+            #print(priprava)
+
+            s = soup.find_all('p', itemprop="recipeIngredient")
+            ses = ''
+            for el in s:
+                ses += el.text.strip() + ' ' #popravi
+            #print(ses)
+
+            pisalec_receptov.writerow([ime, opis, avtor, datum, ID, priloznost, nacin, sezona, vrsta,cas,priprava, ses])
+
+        else:
+            webpage_text = "Unable"
+
+csvfile.close()
