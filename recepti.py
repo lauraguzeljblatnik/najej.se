@@ -2,15 +2,21 @@
 import auth
 auth.db = "sem2019_%s" % auth.user
 
+#prijava na bazo, (z sqlite3):
+#conn = sqlite3.connect('...')
+#curzor :
+#cur = conn.cursor()
+
 # uvozimo psycopg2
 import psycopg2, psycopg2.extensions, psycopg2.extras
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
 
 import csv
+import sqlite3
 
 def ustvari_uporabnik():
     cur.execute("""
-        CREATE TABLE uporabnik(
+        CREATE TABLE IF NOT EXISTS uporabnik(
             id SERIAL NOT NULL,
             ime TEXT NOT NULL,
             skor NUMERIC NOT NULL
@@ -19,7 +25,7 @@ def ustvari_uporabnik():
 
 def ustvari_sestavina():
     cur.execute("""
-        CREATE TABLE sestavina(
+        CREATE TABLE  sestavina(
             id SERIAL NOT NULL,
             ime TEXT NOT NULL
     """)
@@ -66,6 +72,16 @@ def ustvari_recept():
             );
             """)
     conn.commit()
-    
+
+def uvozi_podatke():
+    #odpremo CSV datoteko
+    with open('recepti_data.csv', 'r', encoding='utf-8') as p:
+        vrstice = csv.reader(p)
+        next(vrstice) # izpusti naslovno vrstico
+        for(ime, opis, uporabnik, datum, ID, priložnost, priprava, sezona, vrsta, sestavine, postopek) in vrstice:
+            cur.execute(
+                """INSERT INTO recept (ID, ime, opis, postopek, datum, cas) VALUES (?,?,?,?.?.?)"""
+                [ID, ime, opis, postopek, datum, cas])
+        conn.commit()
             
             
