@@ -5,23 +5,24 @@ import re
 csv_sestavine = "sestavina_data.csv"
 csv_recepti = "recepti_data.csv"
 
-head = ['ID', 'količina', 'sestavina', 'merska enota']
+head = ['ID', 'količina','merska enota', 'sestavina']
+
 
 
 def izberi_podatke(text):
     pattern = re.compile(
-                        r'(?P<kolicina>\d+|nekaj|malo|sol|ščepec) (?P<sestavina>.*)'
+                        r'(?P<kolicina>\d+)(?P<sestavina>\D+)'
                          , re.DOTALL)
     listt =[]
     for pat in re.finditer(pattern, text):
-        listt += [[pat.group('kolicina'),pat.group('sestavina')]]
+        listt += [[int(pat.group('kolicina')), pat.group('sestavina')]]
     return listt
 
 
 
 with open(csv_recepti, 'r', encoding='utf-8') as recepti:
-    with open(csv_sestavine, 'w', encoding='utf-8') as sestavine:
-        pisalec_sestavin = csv.writer(sestavine,delimiter=',')
+    with open(csv_sestavine, 'w', encoding='utf-8') as sestavine_file:
+        pisalec_sestavin = csv.writer(sestavine_file,delimiter=',')
         pisalec_sestavin.writerow(head)
         bralec_receptov = csv.reader(recepti,delimiter=',')
 
@@ -37,11 +38,11 @@ with open(csv_recepti, 'r', encoding='utf-8') as recepti:
             sez += izberi_podatke(sestavine)
             #print(sez)
             for kolicina, sestavina in sez:
-                pisalec_sestavin.writerow([ID,kolicina, sestavina])
+                pisalec_sestavin.writerow([ID,kolicina,sestavina])
 
 
         
-    sestvine.close()
+    sestavine_file.close()
 recepti.close()
         
 
