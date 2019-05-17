@@ -25,36 +25,39 @@ def ustvari_uporabnik():
 
 def ustvari_sestavina():
     cur.execute("""
-        CREATE TABLE  sestavina(
-            id SERIAL NOT NULL,
+        CREATE TABLE IF NOT EXISTS sestavina(
+            id SERIAL PRIMARY KEY NOT NULL,
             ime TEXT NOT NULL
     """)
     conn.commit()
 
 def ustvari_vrsta():
     cur.execute("""
-        CREATE TABLE vrsta(
+        CREATE TABLE IF NOT EXISTS vrsta(
+            id SERIAL PRIMARY KEY NOT NULL,
             kategorija TEXT NOT NULL
     """)
     conn.commit()
 
 def ustvari_priloznost():
     cur.execute("""
-        CREATE TABLE priloznost(
+        CREATE TABLE IF NOT EXISTS priloznost(
+            id SERIAL PRIMARY KEY NOT NULL,
             priloznost TEXT NOT NULL
     """)
     conn.commit()
 
 def ustvari_priprava():
     cur.execute("""
-        CREATE TABLE priprava(
+        CREATE TABLE IF NOT EXISTS priprava(
+            id SERIAL PRIMARY KEY NOT NULL
             priprava TEXT NOT NULL
     """)
     conn.commit()    
 
 def ustvari_recept():
     cur.execute("""
-        CREATE TABLE recept (
+        CREATE TABLE IF NOT EXISTS recept (
             id SERIAL PRIMARY KEY,
             ime TEXT NOT NULL,
             opis TEXT NOT NULL,
@@ -72,6 +75,19 @@ def ustvari_recept():
             );
             """)
     conn.commit()
+
+def ustvari_vsebuje():
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS vsebuje (
+            količina NUMERIC,
+            recept INT
+            rec_sestavina TEXT REFERENCES sestavina(id),
+                        
+            );
+            """)
+    conn.commit()
+
+
 
 def uvozi_podatke():
     #odpremo CSV datoteko
