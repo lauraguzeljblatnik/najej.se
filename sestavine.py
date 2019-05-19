@@ -35,7 +35,7 @@ with open(csv_recepti, 'r', encoding='utf-8') as recepti:
             ID = vrstica[4]
             sestavine = vrstica[11]
             #print(ID,sestavine)
-            sez += izberi_podatke(sestavine)
+            sez = izberi_podatke(sestavine)
             #print(sez)
             for kolicina, sestavina in sez:
                 pisalec_sestavin.writerow([ID,kolicina,sestavina])
