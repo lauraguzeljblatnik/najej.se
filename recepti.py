@@ -1,6 +1,6 @@
 # uvozimo ustrezne podatke za povezavo
 import auth
-auth.db = "sem2019_%s" % auth.user
+auth.db = "sem2019_%s" % auth.user1
 
 
 # uvozimo psycopg2
@@ -9,6 +9,7 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo prob
 
 import csv
 
+
 def ustvari_uporabnik():
     cur.execute("""
         CREATE TABLE IF NOT EXISTS uporabnik(
@@ -16,6 +17,7 @@ def ustvari_uporabnik():
             ime TEXT NOT NULL,
             skor NUMERIC NOT NULL,
             geslo TEXT NOT NULL
+            );
         """)
     conn.commit()
 
@@ -25,6 +27,7 @@ def ustvari_sestavina():
             id SERIAL PRIMARY KEY,
             ime TEXT NOT NULL,
             enota TEXT
+            );
     """)
     conn.commit()
 
@@ -33,6 +36,7 @@ def ustvari_vrsta():
         CREATE TABLE IF NOT EXISTS vrsta(
             id SERIAL PRIMARY KEY,
             ime TEXT NOT NULL
+            );
     """)
     conn.commit()
 
@@ -41,6 +45,7 @@ def ustvari_priloznost():
         CREATE TABLE IF NOT EXISTS priloznost(
             id SERIAL PRIMARY KEY,
             ime TEXT NOT NULL
+        );
     """)
     conn.commit()
 
@@ -49,6 +54,7 @@ def ustvari_priprava():
         CREATE TABLE IF NOT EXISTS priprava(
             id SERIAL PRIMARY KEY,
             ime TEXT NOT NULL
+        );
     """)
     conn.commit()
 
@@ -65,7 +71,7 @@ def ustvari_komentar():
             );
             """)
     conn.commit()
-    
+
 
 def ustvari_recept():
     cur.execute("""
@@ -122,27 +128,46 @@ def ustvari_vsebuje():
             količina NUMERIC NOT NULL,
             recept INTEGER NOT NULL REFERENCES recept(id),
             sestavina INTEGER NOT NULL REFERENCES sestavina(id),
-
             PRIMARY KEY (recept, sestavina)
             );
             """)
     conn.commit()
+   
 
-
-
-def uvozi_podatke():
+def uvozi_podatke(file):
     #odpremo CSV datoteko
-    with open('recepti.csv', 'r', encoding='utf-8') as p:
-        vrstice = csv.reader(p)
-        next(vrstice) # izpusti naslovno vrstico
-        for(ime, opis, uporabnik, datum, ID, priloznost, priprava, sezona, vrsta, cas, postopek, sestavine) in vrstice:
+    with open(file, 'r', encoding='utf-8') as p:
+        vrstica = csv.reader(p)
+        next(vrstica)# izpusti naslovno vrstico
+        for r in vrstica:
+            print("berem")
             r = [None if x in ('', '-') else x for x in r]
-            r= r[1:(len(r))]
+            #r= r[1:(len(r))]
+            #print(r)
             cur.execute(
                 """INSERT INTO priloznost (priloznost) VALUES (%s)
                     RETURNING id""",r)
             rid, = cur.fetchone()
-        conn.commit()
+    conn.commit()
+
+      
+  
+# uredi pravice za dostop do baze
+def pravice():
+    cur.execute("""
+        GRANT ALL ON ALL TABLES IN SCHEMA public TO klarag;
+        GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO klarag;
+        GRANT ALL ON SCHEMA public TO klarag;
+        GRANT ALL ON ALL TABLES IN SCHEMA public TO lauragb;
+        GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO lauragb;
+        GRANT ALL ON SCHEMA public TO lauragb;
+        GRANT CONNECT ON DATABASE sem2019_klarag TO javnost;
+        GRANT USAGE ON SCHEMA public TO javnost;
+        GRANT SELECT ON ALL TABLES IN SCHEMA public TO javnost;
+        GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO javnost;
+    """)
+    print("dodane pravice")
+    conn.commit()
             
             
 
@@ -150,3 +175,8 @@ def uvozi_podatke():
 
 conn = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password)
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor) 
+
+#pravice()
+#ustvari_priprava()
+#ustvari_priloznost()
+uvozi_podatke("recepti.csv")
