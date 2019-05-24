@@ -2,4 +2,4 @@
 
 Projektna naloga za OPB.
 
-![ER diagram2](ERdiagram.png)
+![Diagram2](ERdiagram.png)
