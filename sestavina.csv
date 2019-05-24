@@ -60,8 +60,8 @@ ID,količina,merska enota,sestavina
 21296,12,dag,sladkor 
 21296,1,,vanilin sladkor 
 21296,3,dl,mleko 
-21296,4,žlica,um 
-21296,2,jajce
+21296,4,žlica,rum 
+21296,2,,jajce
 21296,1,,sok
 21296,1,,lupina limona 
 21296,20,dag,čokolada
@@ -382,7 +382,7 @@ ID,količina,merska enota,sestavina
 21326,2,dl,olje 
 21326,100,ml,sladka smetana 
 21326,2,žlica,mascarpone
-21326,0.5,vanilijin sladkor
+21326,0.5,,vanilijin sladkor
 21326,6,žlica,sok 
 21327,250,g,prosena kaša 
 21327,1,,sol 
@@ -949,5 +949,5 @@ ID,količina,merska enota,sestavina
 21399,250,g,polnomastna nepasirana skuta 
 21399,150,g,brezglutenska mešanica za temni kruh 
 21399,100,g,kvinojska moka 
-21399,1,pecilni prašek 
+21399,1,,pecilni prašek 
 21399,1,dl,mleko 

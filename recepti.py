@@ -66,7 +66,8 @@ def ustvari_komentar():
             id SERIAL PRIMARY KEY,
             avtor INTEGER NOT NULL REFERENCES uporabnik(id),
             cas DATE NOT NULL DEFAULT now(),
-            vsebina TEXT NOT NULL                        
+            vsebina TEXT NOT NULL,
+            recept INTEGER REFERENCES recept(id)
             );
             """)
     conn.commit()
@@ -82,9 +83,7 @@ def ustvari_recept():
             datum_objave DATE NOT NULL,
             ocena NUMERIC,
             cas TEXT,
-            uporabnik INTEGER NOT NULL REFERENCES uporabnik(id),
-            komentar INTEGER REFERENCES komentar(id)
-            
+            uporabnik INTEGER NOT NULL REFERENCES uporabnik(id)            
             );
             """)
     conn.commit()
@@ -134,7 +133,7 @@ def ustvari_vsebuje():
     conn.commit()
 
 
-def uvozi_podatke1(file):
+def uvozi_vrsta_priprava_priloznost(file):
     #odpremo CSV datoteko
     with open(file, 'r', encoding='utf-8') as p:
         vrstica = csv.reader(p, delimiter = ',')
@@ -179,13 +178,48 @@ def uvozi_podatke1(file):
                 """INSERT INTO vrsta(ime) VALUES ('%s');""" % str(el))
         conn.commit()
 
-def uvozi_podatke2(file):
+def uvozi_sestavine(file):
     with open(file, 'r', encoding='utf-8') as p:
         vrstica = csv.reader(p, delimiter = ',')
         next(vrstica)# izpusti naslovno vrstico
+        sez = []
         for r in vrstica:
             if len(r) == 0:
                 continue
+            pom = (r[3].split(','))
+            sez += pom
+        sestavine = set()
+        for el in sez:
+            if el != '':
+                sestavine.add(el.strip())
+        for el in sestavine:
+            cur.execute(
+                """INSERT INTO sestavina(ime) VALUES ('%s');""" % str(el))
+        conn.commit()
+
+def uvozi_uporabnik(file):
+    with open(file, 'r', encoding='utf-8') as p:
+        vrstica = csv.reader(p, delimiter = ',')
+        next(vrstica)# izpusti naslovno vrstico
+        sez = []
+        for r in vrstica:
+            if len(r) == 0:
+                continue
+            pom = (r[2].split(','))
+            sez += pom
+        uporabnik = set()
+        for el in sez:
+            if el != '':
+                uporabnik.add(el.strip())
+        uploaded = {}        
+        for el in uporabnik:
+            cur.execute(
+                """INSERT INTO uporabnik(ime, skor, geslo)
+                VALUES ('%s', %s, '%s') RETURNING id;""" %( str(el),0,str(el)))
+            uporabnik_id = cur.fetchone()
+            uploaded[el] = uporabnik_id
+        print(uploaded)  
+        conn.commit()
             
   
 # uredi pravice za dostop do baze
@@ -214,17 +248,19 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 #KLICANJE FUNKCIJ
 
-#pravice()
-##ustvari_uporabnik()
-##ustvari_sestavina()
-##ustvari_vrsta()
-##ustvari_priprava()
-##ustvari_priloznost()
-##ustvari_komentar()
-##ustvari_recept()
-##ustvari_vsebuje()
-##ustvari_priprava_recepta()
-##ustvari_priloznost_recepta()
-##ustvari_vrsta_recepta()
-##
-##uvozi_podatke1("recepti.csv")
+pravice()
+ustvari_uporabnik()
+ustvari_sestavina()
+ustvari_vrsta()
+ustvari_priprava()
+ustvari_priloznost()
+ustvari_recept()
+ustvari_komentar()
+ustvari_vsebuje()
+ustvari_priprava_recepta()
+ustvari_priloznost_recepta()
+ustvari_vrsta_recepta()
+
+#uvozi_vrsta_priprava_priloznost("recepti.csv")
+#uvozi_sestavine("sestavina.csv")
+uvozi_uporabnik("recepti.csv")
