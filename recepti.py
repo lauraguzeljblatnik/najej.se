@@ -8,6 +8,8 @@ import psycopg2, psycopg2.extensions, psycopg2.extras
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
 
 import csv
+import numpy as np
+from datetime import datetime
 
 
 def ustvari_uporabnik():
@@ -25,8 +27,7 @@ def ustvari_sestavina():
     cur.execute("""
         CREATE TABLE IF NOT EXISTS sestavina(
             id SERIAL PRIMARY KEY,
-            ime TEXT NOT NULL,
-            enota TEXT
+            ime TEXT NOT NULL
             );
     """)
     conn.commit()
@@ -64,10 +65,8 @@ def ustvari_komentar():
         CREATE TABLE IF NOT EXISTS komentar (
             id SERIAL PRIMARY KEY,
             avtor INTEGER NOT NULL REFERENCES uporabnik(id),
-            cas INTEGER NOT NULL DEFAULT (strftime('%s','now')),
-            vsebina TEXT NOT NULL,
-            recept INTEGER NOT NULL REFERENCES recept(id)
-                        
+            cas DATE NOT NULL DEFAULT now(),
+            vsebina TEXT NOT NULL                        
             );
             """)
     conn.commit()
@@ -92,7 +91,7 @@ def ustvari_recept():
     
 def ustvari_vrsta_recepta():
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS vsebuje (
+        CREATE TABLE IF NOT EXISTS vrsta_recepta (
             recept INTEGER NOT NULL REFERENCES recept(id),
             vrsta INTEGER REFERENCES vrsta(id),
             PRIMARY KEY (recept, vrsta)
@@ -102,7 +101,7 @@ def ustvari_vrsta_recepta():
     
 def ustvari_priloznost_recepta():
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS vsebuje (
+        CREATE TABLE IF NOT EXISTS priloznost_recepta (
             recept INTEGER NOT NULL REFERENCES recept(id),
             priloznost INTEGER REFERENCES priloznost(id),
 
@@ -113,11 +112,11 @@ def ustvari_priloznost_recepta():
 
 def ustvari_priprava_recepta():
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS vsebuje (
+        CREATE TABLE IF NOT EXISTS priprava_recepta (
             recept INTEGER NOT NULL REFERENCES recept(id),
             priprava INTEGER REFERENCES priprava(id),
 
-            PRIMARY KEY (recept, vrsta)
+            PRIMARY KEY (recept, priprava)
             );
             """)
     conn.commit()
@@ -125,32 +124,69 @@ def ustvari_priprava_recepta():
 def ustvari_vsebuje():
     cur.execute("""
         CREATE TABLE IF NOT EXISTS vsebuje (
-            količina NUMERIC NOT NULL,
+            kolicina NUMERIC NOT NULL,
             recept INTEGER NOT NULL REFERENCES recept(id),
             sestavina INTEGER NOT NULL REFERENCES sestavina(id),
+            enota TEXT,
             PRIMARY KEY (recept, sestavina)
             );
             """)
     conn.commit()
-   
 
-def uvozi_podatke(file):
+
+def uvozi_podatke1(file):
     #odpremo CSV datoteko
     with open(file, 'r', encoding='utf-8') as p:
-        vrstica = csv.reader(p)
+        vrstica = csv.reader(p, delimiter = ',')
+        next(vrstica)# izpusti naslovno vrstico
+        #print(vrstica)
+        sez1 = []
+        sez2 = []
+        sez3 = []
+        for r in vrstica: 
+            if len(r) == 0:
+                continue
+            pom1 = (r[5].split(','))
+            sez1 += pom1
+            pom2 = (r[6].split(','))
+            sez2 += pom2
+            pom3 = (r[8].split(','))
+            sez3 += pom3
+
+        priloznost = set()
+        for el in sez1:
+            if el != '':
+                priloznost.add(el.strip())
+
+        priprava = set()
+        for el in sez2:
+            if el != '':
+                priprava.add(el.strip())
+                
+        vrsta = set()
+        for el in sez3:
+            if el != '':
+                vrsta.add(el.strip())
+                
+        for el in priloznost:
+            cur.execute(
+                """INSERT INTO priloznost(ime) VALUES ('%s');""" % str(el))
+        for el in priprava:
+            cur.execute(
+                """INSERT INTO priprava(ime) VALUES ('%s');""" % str(el))
+        for el in vrsta:
+            cur.execute(
+                """INSERT INTO vrsta(ime) VALUES ('%s');""" % str(el))
+        conn.commit()
+
+def uvozi_podatke2(file):
+    with open(file, 'r', encoding='utf-8') as p:
+        vrstica = csv.reader(p, delimiter = ',')
         next(vrstica)# izpusti naslovno vrstico
         for r in vrstica:
-            print("berem")
-            r = [None if x in ('', '-') else x for x in r]
-            #r= r[1:(len(r))]
-            #print(r)
-            cur.execute(
-                """INSERT INTO priloznost (priloznost) VALUES (%s)
-                    RETURNING id""",r)
-            rid, = cur.fetchone()
-    conn.commit()
-
-      
+            if len(r) == 0:
+                continue
+            
   
 # uredi pravice za dostop do baze
 def pravice():
@@ -176,7 +212,19 @@ def pravice():
 conn = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password)
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor) 
 
+#KLICANJE FUNKCIJ
+
 #pravice()
-#ustvari_priprava()
-#ustvari_priloznost()
-uvozi_podatke("recepti.csv")
+##ustvari_uporabnik()
+##ustvari_sestavina()
+##ustvari_vrsta()
+##ustvari_priprava()
+##ustvari_priloznost()
+##ustvari_komentar()
+##ustvari_recept()
+##ustvari_vsebuje()
+##ustvari_priprava_recepta()
+##ustvari_priloznost_recepta()
+##ustvari_vrsta_recepta()
+##
+##uvozi_podatke1("recepti.csv")
