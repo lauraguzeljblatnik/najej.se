@@ -197,18 +197,31 @@ def uvozi_sestavine(file):
                 """INSERT INTO sestavina(ime) VALUES ('%s');""" % str(el))
         conn.commit()
 
-def uvozi_uporabnik(file):
+def uvozi_uporabnik_recept(file):
     with open(file, 'r', encoding='utf-8') as p:
         vrstica = csv.reader(p, delimiter = ',')
         next(vrstica)# izpusti naslovno vrstico
-        sez = []
+        upo = []
+        
+        ime = []
+        opis = []
+        id_ = []
+        datum = []
+        cas = []
+        postopek = []
         for r in vrstica:
             if len(r) == 0:
                 continue
-            pom = (r[2].split(','))
-            sez += pom
+            upo1 = (r[2].split(','))
+            upo += upo1
+            
+            ime1 = 
+            opis =
+            datum =
+            cas =
+            postopek = 
         uporabnik = set()
-        for el in sez:
+        for el in upo:
             if el != '':
                 uporabnik.add(el.strip())
         uploaded = {}        
@@ -218,7 +231,7 @@ def uvozi_uporabnik(file):
                 VALUES ('%s', %s, '%s') RETURNING id;""" %( str(el),0,str(el)))
             uporabnik_id = cur.fetchone()
             uploaded[el] = uporabnik_id
-        print(uploaded)  
+        print(uploaded) 
         conn.commit()
             
   
@@ -263,4 +276,4 @@ ustvari_vrsta_recepta()
 
 #uvozi_vrsta_priprava_priloznost("recepti.csv")
 #uvozi_sestavine("sestavina.csv")
-uvozi_uporabnik("recepti.csv")
+uvozi_uporabnik_recept("recepti.csv")

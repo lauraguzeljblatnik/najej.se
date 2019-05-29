@@ -9,7 +9,7 @@
 	<link rel="icon" href="../static/hat.ico">
 
 
-    <title>Najej.se prijava</title>
+    <title>Najej.se registracija</title>
   
 
     <!-- Bootstrap core CSS -->
@@ -34,22 +34,26 @@
 <!-- This snippet uses Font Awesome 5 Free as a dependency. You can download it at fontawesome.io! -->
 
 <body>
-<div>
   <div class="container">
     <div class="row">
       <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
         <div class="card card-signin my-5">
           <div class="card-body">
-            <h5 class="card-title text-center">Pozdravljeni!</h5>
+            <h5 class="card-title text-center">Registracija</h5>
 
             <form class="form-signin" method = "post" action="glavna.html">
               <div class="form-label-group">
-                <input type="username" id="inputUsername" class="form-control" placeholder="Uporabniško ime" name="username">
+                <input type="username" id="inputUsername" class="form-control" placeholder="Uporabniško ime" name="username" required autofocus>
                 <label for="inputUsername"></label>
+              </div>
+			  
+			     <div class="form-label-group">
+                <input type="password" id="inputPassword" class="form-control" name="password1" placeholder="Geslo" required>
+                <label for="inputPassword"></label>
               </div>
 
               <div class="form-label-group">
-                <input type="password" id="inputPassword" class="form-control" placeholder="Geslo" required>
+                <input type="password" id="inputPassword" class="form-control" placeholder="Ponovi geslo" name="password2" required>
                 <label for="inputPassword"></label>
               </div>
 			  
@@ -58,12 +62,8 @@
 			%end -->
 
 
-              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Prijava</button>
-			  <label for="prijava"></label>
-
-			   <div>
-				<a class="btn btn-lg btn-primary btn-block text-uppercase" href="registracija.html">Registracija</a>
-				</div>
+              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Naj se kuhanje začne!</button>
+			  <label for="registracija"></label>
            
             </form>
           </div>
@@ -71,7 +71,6 @@
       </div>
     </div>
   </div>
- </div>
 </body>
 
 
