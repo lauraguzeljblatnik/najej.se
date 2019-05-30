@@ -11,8 +11,8 @@ import auth_public as auth
 import psycopg2, psycopg2.extensions, psycopg2.extras
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
 
-# odkomentiraj, če želiš sporočila o napakah
-# debug(True)
+odkomentiraj, če želiš sporočila o napakah
+debug(True)
 
 @get('/static/<filename:path>')
 def static(filename):
@@ -20,30 +20,30 @@ def static(filename):
 
 @get('/')
 def index():
-    cur.execute("SELECT * FROM oseba ORDER BY priimek, ime")
-    return template('komitenti.html', osebe=cur)
+    cur.execute("SELECT * FROM recept ORDER BY id")
+    return template('recepti.html', recept=cur)
 
-@get('/transakcije/:x/')
-def transakcije(x):
-    cur.execute("SELECT * FROM transakcija WHERE znesek > %s ORDER BY znesek, id", [int(x)])
-    return template('transakcije.html', x=x, transakcije=cur)
-
-@get('/dodaj_transakcijo')
-def dodaj_transakcijo():
-    return template('dodaj_transakcijo.html', znesek='', racun='', opis='', napaka=None)
-
-@post('/dodaj_transakcijo')
-def dodaj_transakcijo_post():
-    znesek = request.forms.znesek
-    racun = request.forms.racun
-    opis = request.forms.opis
-    try:
-        cur.execute("INSERT INTO transakcija (znesek, racun, opis) VALUES (%s, %s, %s)",
-                    (znesek, racun, opis))
-    except Exception as ex:
-        return template('dodaj_transakcijo.html', znesek=znesek, racun=racun, opis=opis,
-                        napaka = 'Zgodila se je napaka: %s' % ex)
-    redirect("/")  
+##@get('/transakcije/:x/')
+##def transakcije(x):
+##    cur.execute("SELECT * FROM transakcija WHERE znesek > %s ORDER BY znesek, id", [int(x)])
+##    return template('transakcije.html', x=x, transakcije=cur)
+##
+##@get('/dodaj_transakcijo')
+##def dodaj_transakcijo():
+##    return template('dodaj_transakcijo.html', znesek='', racun='', opis='', napaka=None)
+##
+##@post('/dodaj_transakcijo')
+##def dodaj_transakcijo_post():
+##    znesek = request.forms.znesek
+##    racun = request.forms.racun
+##    opis = request.forms.opis
+##    try:
+##        cur.execute("INSERT INTO transakcija (znesek, racun, opis) VALUES (%s, %s, %s)",
+##                    (znesek, racun, opis))
+##    except Exception as ex:
+##        return template('dodaj_transakcijo.html', znesek=znesek, racun=racun, opis=opis,
+##                        napaka = 'Zgodila se je napaka: %s' % ex)
+##    redirect("/")  
 
 ######################################################################
 # Glavni program
