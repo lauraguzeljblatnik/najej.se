@@ -37,35 +37,26 @@ ID,količina,merska enota,sestavina
 21295,4,dag,sladkor 
 21295,3,dag,maslo 
 21295,2,,jajce
-21295,2,,rumenjak 
+21295,3,,rumenjak 
 21295,2,žlica,olje 
 21295,2,žlica,kakav v prahu
 21295,5,žlička,sol 
-21295,4,dl,mleko 
 21295,1,strok,vanilija 
-21295,1,,vanilin puding 
-21295,2,žlica,sladkor 
-21295,1,,rumenjak 
+21295,1,,vanilin puding  
 21295,1,,beljak 
-21295,5,dag,sladkor 
 21296,2,dl,mleko 
 21296,48,dag,moka 
 21296,7,dag,kisla smetana 
 21296,6,dag,maslo 
-21296,3,dag,sladkor 
+21296,15,dag,sladkor 
 21296,2,,jajce 
-21296,2,žlica,rum 
+21296,6,žlica,rum 
 21296,5,žlička,sol 
 21296,25,dag,kokosova moka 
-21296,12,dag,sladkor 
 21296,1,,vanilin sladkor 
-21296,3,dl,mleko 
-21296,4,žlica,rum 
-21296,2,,jajce
 21296,1,,sok
 21296,1,,lupina limona 
 21296,20,dag,čokolada
-21296,1,,jajce 
 21297,1,kocka,kvas 
 21297,47,dag,moka 
 21297,2,dl,mleko 
@@ -76,10 +67,8 @@ ID,količina,merska enota,sestavina
 21297,2,,rumenjak 
 21297,2,žlica,olje 
 21297,2,žlica,kakav v prahu
-21297,5,žlička,sol 
-21297,5,dl,mleko 
-21297,25,dag,kokosova moka 
-21297,12,dag,sladkor 
+21297,5,žlička,sol  
+21297,25,dag,kokosova moka  
 21297,2,,beljak 
 21297,2,žlica,mascarpone sir
 21297,1,,limonina lupina
@@ -91,15 +80,12 @@ ID,količina,merska enota,sestavina
 21298,14,dag,maslo 
 21298,2,,jajce
 21298,2,,rumenjak 
-21298,5,žlička,sol 
-21298,15,dag,maslo 
+21298,5,žlička,sol  
 21298,10,dag,rozine 
 21298,10,dag,brusnice 
 21298,10,dag,suhe slive
 21298,10,dag,jagode 
 21298,4,,vanilin sladkor 
-21298,1,žlica,sladkor 
-21298,1,,jajce 
 21299,7,dl,voda 
 21299,15,dag,ržena moka 
 21299,75,dag,bela moke
@@ -107,9 +93,7 @@ ID,količina,merska enota,sestavina
 21299,20,dag,kislo testo 
 21299,3,žlica,semena sezama 
 21299,3,žlica,semena sončnic 
-21299,3,žlička,sol
-21299,5,dl,voda 
-21300,5,dl,voda 
+21299,3,žlička,sol 
 21300,34,dag,bela moka 
 21300,20,dag,polnozrnata pirina moka 
 21300,6,dag,črna moka 
@@ -120,10 +104,7 @@ ID,količina,merska enota,sestavina
 21301,45,dag,bela moka 
 21301,9,dag,kisla smetana 
 21301,7,dag,maslo 
-21301,3,dag,sladkor 
-21301,1,,rumenjak 
-21301,1,,jajce 
-21301,5,žlička,sol 
+21301,1,,rumenjak  
 21301,60,dag,orehi 
 21301,5,dl,sladka smetana 
 21301,5,dl,rum 
@@ -137,7 +118,6 @@ ID,količina,merska enota,sestavina
 21302,70,dag,moka 
 21302,5,dag,sladkor 
 21302,2,,vanilin sladkor 
-21302,3,,jajce 
 21302,1,,rumenjak 
 21302,5,žlica,olje 
 21302,3,žlička,sol 
@@ -148,8 +128,7 @@ ID,količina,merska enota,sestavina
 21303,5,dag,maslo
 21303,4,dag,sladkor 
 21303,1,,vanilin sladkor 
-21303,1,,rumenjak 
-21303,1,,jajce 
+21303,1,,rumenjak  
 21303,2,dl,rum 
 21303,5,žlička,sol 
 21303,1,,jajce 
@@ -173,17 +152,13 @@ ID,količina,merska enota,sestavina
 21307,1,kos,ingver
 21307,1,košček,muškatni orešček
 21307,1,,poper
-21307,1,,sol 
-21308,100,g,rum 
+21307,1,,sol
 21308,300,g,gladka moka 
 21308,1,,pecilni prašek 
 21308,4,,jajca 
-21308,250,g,sladkor 
-21308,140,g,maslo 
 21308,125,ml,mleko 
 21308,1,,sladkor v prahu 
 21308,130,g,temna čokolada 
-21308,200,ml,sladka smetana 
 21308,100,g,mlečna čokolada
 21308,75,g,maslo 
 21308,50,g,margarina 
@@ -193,8 +168,7 @@ ID,količina,merska enota,sestavina
 21308,1,žlica,kisla smetana 
 21308,1,žlička,rum 
 21308,15,g,želatina
-21308,175,ml,sladka smetana 
-21309,450,g,testo
+21308,175,ml,sladka smetana
 21309,250,g,moka 
 21309,75,g,sladkor 
 21309,1,,jajce 
@@ -204,10 +178,7 @@ ID,količina,merska enota,sestavina
 21309,450,g,testo 
 21309,80,ml,mleko 
 21309,125,g,mleti mak 
-21309,25,g,maslo 
-21309,40,g,sladkor 
 21309,1,zavojček,vaniljev sladkor
-21309,1,,jajce 
 21310,100,g,baby piškoti 
 21310,5,žliča,instant cappuccino 
 21310,2,dl,voda 
@@ -218,16 +189,13 @@ ID,količina,merska enota,sestavina
 21310,2,,banana 
 21310,50,g,maslo 
 21310,50,g,jedilna čokolada 
-21310,1,žlica,rum 
-21310,1,žlica,mleko 
+21310,1,žlica,rum  
 21311,100,g,mandlji
-21311,130,g,sladkor v prahu 
 21311,75,g,moka 
 21311,100,g,margarina
 21311,1,ščepec,pecilni prašek 
 21311,4,,beljak 
 21311,2,kozarček,liker
-21311,1,,beljak 
 21311,150,g,sladkor v prahu 
 21311,1,žlica,limonin sok 
 21312,600,g,bela moka 
@@ -303,11 +271,8 @@ ID,količina,merska enota,sestavina
 21319,300,g,jagode
 21319,1,žlica,gustin 
 21319,1,,limona 
-21319,1,,vanilin sladkor 
-21319,3,žlica,sladkor 
 21319,4,,beljak 
 21319,2,žlica,sladkor v prah
-21319,1,,maline 
 21320,1,zavitek,listnato testo 
 21320,300,g,nepasirana skuta 
 21320,3,žlica,kisla smetana 
@@ -324,19 +289,13 @@ ID,količina,merska enota,sestavina
 21322,250,ml,mandljevo mleko 
 21322,120,ml,olje 
 21322,2,žlica,kokosovo olje 
-21322,1,,limona 
 21322,2,žlička,vanilijev ekstrakt 
 21322,2,,limona
-21322,200,ml,mandljevo mleko 
-21322,500,ml,kokosovo mleko 
-21322,250,ml,mandljevo mleko 
 21322,2,,vanilijev puding 
 21322,3,žlica,tapioka 
 21322,3,žlica,kokosova moka 
 21322,5,žlica,sladkor
-21322,1,,limona 
 21322,350,g,maline 
-21322,3,žlica,sladkor v prahu
 21322,7,dl,limonin sok
 21322,7,žlica,sladkor v prahu 
 21322,1,žlica,kokosovo mleko 
@@ -354,7 +313,6 @@ ID,količina,merska enota,sestavina
 21324,2,dl,mleko 
 21324,1,,jajce 
 21324,3,žlica,olje
-21324,2,žlička,sol 
 21324,50,dag,skuta 
 21324,1,lonček,jogurt
 21324,1,ščepec,sol 
@@ -362,7 +320,6 @@ ID,količina,merska enota,sestavina
 21324,1,,drobtine 
 21324,3,žlica,bela moka
 21324,0.5,skodelica,orehi 
-21324,2,žlica,maslo 
 21324,2,žlica,rjavi sladkor
 21324,2,,jabolko
 21324,1,ščepec,cimet
@@ -397,10 +354,8 @@ ID,količina,merska enota,sestavina
 21329,5,žlica,krušne drobtine 
 21329,500,g,maslo 
 21329,3,dl,jedilno olje
-21329,700,g,sladkor
 21329,1,l,voda 
 21330,4,,jajce 
-21330,180,g,sladkor 
 21330,1,,vanilin sladkor 
 21330,60,g,moka 
 21330,30,g,kakav v prahu 
@@ -427,15 +382,13 @@ ID,količina,merska enota,sestavina
 21333,2,žlica,čajno maslo
 21333,2,žlica,oljčno olje
 21333,1,,cvetača 
-21333,125,ml,jušna osnova iz brezmesne jušne kocke 
-21334,1,,čebula 
+21333,125,ml,jušna osnova iz brezmesne jušne kocke  
 21334,1,strok,česen 
 21334,2,,kajzerica
 21334,125,ml,polnomastno mleko 
 21334,500,g,mešano mleto meso
 21334,2,,jajce 
 21334,1,žlica,gorčica 
-21334,2,žlica,pšenična moka 
 21334,3,žlica,krušne drobtine 
 21334,250,g,pšenična moka 
 21334,2,žlica,čajno maslo 
@@ -551,17 +504,14 @@ ID,količina,merska enota,sestavina
 21346,75,g,peteršilj
 21346,1,žlička,maslo
 21346,1,kg,krompir 
-21346,150,g,maslo 
 21346,50,ml,polnomastno mleko 
 21348,4,,jajce 
 21348,1,,skodelica,sladkor
 21348,1,,vanilin sladkor 
-21348,100,g,kokosova moka 
 21348,6,žlica,moka 
 21348,2,,pecilni prašek 
 21348,1,skodelica,mleko 
 21348,2,skodelica,olje 
-21348,1,l,mleko 
 21348,1,,vanilijev puding 
 21348,1,,čokoladni puding 
 21348,8,žlica,sladkor 
@@ -575,19 +525,14 @@ ID,količina,merska enota,sestavina
 21349,6,dl,smetana
 21349,500,g,nepasirana skuta 
 21349,250,g,mileram
-21349,120,g,sladkor 
 21349,15,g,želatina 
 21349,40,g,mangov žele 
 21349,25,g,mangov pire
 21349,1,dl,voda 
-21349,2,žlica,sladkor 
 21349,4,list,meta 
 21349,300,g,malinov pire 
-21349,250,g,jagodičevje 
-21349,100,g,sladkor 
+21349,250,g,jagodičevje  
 21349,1,žlica,škrob
-21349,6,dl,smetana
-21349,13,g,želatina
 21350,75,g,ostra moka
 21350,25,g,ajdova moka 
 21350,1,,jajce 
@@ -609,7 +554,6 @@ ID,količina,merska enota,sestavina
 21351,40,g,fige 
 21352,1,,raca
 21352,2,,čebula
-21352,1,,pomaranča 
 21352,1,,korenček 
 21352,1,,peteršilj
 21352,400,ml,jušna osnova
@@ -689,18 +633,14 @@ ID,količina,merska enota,sestavina
 21361,8,cl,limonin sok
 21361,8,žlička,sladkor v prahu 
 21362,250,g,moka
-21362,150,g,maslo 
-21362,70,g,sladkor 
+21362,150,g,maslo  
 21362,1,zavitek,vanilin sladkor 
 21362,1,,jajce
 21362,500,g,rabarbara 
 21362,250,g,jagode 
-21362,1,zavitek,vanilin sladkor 
 21362,1,žlica,sladkor
 21362,5,dl,cedevita 
-21362,75,g,moke 
-21362,75,g,sladkor 
-21362,75,g,maslo 
+21362,75,g,moke  
 21363,1,,lubenica 
 21363,5,kg,solata
 21363,200,g,sir
@@ -763,8 +703,7 @@ ID,količina,merska enota,sestavina
 21373,30,g,kakav
 21373,250,g,mascarpone 
 21373,5,l,smetana za stepanje 
-21373,2,,limona 
-21373,4,žlica,sladkor 
+21373,2,,limona  
 21374,200,g,jedilna čokolada 
 21374,120,ml,sladka smetana 
 21374,300,g,Nutella
@@ -815,7 +754,6 @@ ID,količina,merska enota,sestavina
 21381,4,kocka,kvas
 21381,15,dag,kislo testo
 21381,5,žlička,sol 
-21381,5,dl,voda
 21381,10,dag,slanina 
 21381,25,dag,mocarella 
 21382,2,,jajce 
@@ -823,7 +761,6 @@ ID,količina,merska enota,sestavina
 21382,60,g,sladkor
 21382,250,ml,sladka smetana
 21382,500,g,zamrznjeni gozdni sadeži
-21382,100,g,sladkor 
 21382,200,ml,polsuho belo vino 
 21382,2,žlička,teranov liker 
 21382,1,,limona 
@@ -837,8 +774,7 @@ ID,količina,merska enota,sestavina
 21383,2,žlica,rum 
 21383,5,žlička,sol
 21383,40,dag,marelica
-21383,15,dag,maslo 
-21383,10,dag,sladkor 
+21383,15,dag,maslo  
 21383,2,,vanilijev sladkor
 21384,3,g,agar 
 21384,30,g,sladkor 
@@ -855,7 +791,6 @@ ID,količina,merska enota,sestavina
 21385,2,žlička,sol 
 21385,1,kg,jagode 
 21385,15,dag,marmelada 
-21385,1,,jajce
 21386,200,g,gladka moka
 21386,30,g,kakav v prahu 
 21386,150,g,maslo
@@ -877,8 +812,6 @@ ID,količina,merska enota,sestavina
 21387,40,dag,ringlo 
 21387,30,dag,orehi 
 21387,18,dag,ajdova kaša
-21387,15,dag,sladkor
-21387,5,dl,mleko
 21387,25,dag,kisla smetana 
 21387,3,,beljak
 21388,300,g,sladkor v prahu
@@ -889,7 +822,6 @@ ID,količina,merska enota,sestavina
 21389,78,dag,moka 
 21389,15,dag,jogurt 
 21389,8,dag,maslo 
-21389,8,dag,sladkor 
 21389,3,,rumenjak 
 21389,2,žlička,sol 
 21389,1,kg,marelica 
