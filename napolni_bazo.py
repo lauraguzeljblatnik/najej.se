@@ -1,6 +1,6 @@
 # uvozimo ustrezne podatke za povezavo
 import auth
-auth.db = "sem2019_%s" % auth.user1
+auth.db = "sem2019_%s" % auth.user
 
 
 # uvozimo psycopg2
@@ -196,6 +196,7 @@ def uvozi_sestavine(file):
             cur.execute(
                 """INSERT INTO sestavina(ime) VALUES ('%s');""" % str(el))
         conn.commit()
+        return 
 
 def uvozi_uporabnik_recept(file):
     with open(file, 'r', encoding='utf-8') as p:
@@ -209,17 +210,26 @@ def uvozi_uporabnik_recept(file):
         datum = []
         cas = []
         postopek = []
+        ocena= []
         for r in vrstica:
             if len(r) == 0:
                 continue
             upo1 = (r[2].split(','))
             upo += upo1
-            
-            ime1 = 
-            opis =
-            datum =
-            cas =
-            postopek = 
+            ime1 =  (r[0].split(','))
+            ime += ime1
+            opis1 = (r[1].split(','))
+            opis += opis1
+            datum1 = (r[3].split(','))
+            datum2 = datetime.strptime(datum1[0], '%d.%m.%Y')
+            datum.append(datum2.date())
+            id1 = (r[4].split(','))
+            id_.append(int(id1[0]))
+            cas1 = (r[9].split('..'))
+            cas += cas1
+            postopek1 = (r[10])
+            postopek.append(str(postopek1))
+            ocena += [0]
         uporabnik = set()
         for el in upo:
             if el != '':
@@ -231,7 +241,15 @@ def uvozi_uporabnik_recept(file):
                 VALUES ('%s', %s, '%s') RETURNING id;""" %( str(el),0,str(el)))
             uporabnik_id = cur.fetchone()
             uploaded[el] = uporabnik_id
-        print(uploaded) 
+        #spremeni, če dodaš še več podatkov
+        for i in range(100):
+            cur.execute(
+            """INSERT INTO recept(id, ime, opis, postopek, datum_objave, ocena, cas, uporabnik)
+            VALUES (%(id)s, %(ime)s, %(opis)s, %(postopek)s, %(datum)s, %(ocena)s, %(cas)s, %(uporabnik)s )""",
+            {'id': id_[i], 'ime': ime[i], 'opis': opis[i], 'postopek': postopek[i],
+             'datum': datum[i], 'ocena': ocena[i], 'cas': cas[i],
+             'uporabnik': uploaded[upo[i]][0]})
+        
         conn.commit()
             
   
@@ -274,6 +292,6 @@ ustvari_priprava_recepta()
 ustvari_priloznost_recepta()
 ustvari_vrsta_recepta()
 
-#uvozi_vrsta_priprava_priloznost("recepti.csv")
-#uvozi_sestavine("sestavina.csv")
-uvozi_uporabnik_recept("recepti.csv")
+uvozi_vrsta_priprava_priloznost("recepti.csv")
+uvozi_sestavine("sestavina.csv")
+#uvozi_uporabnik_recept("recepti.csv")
