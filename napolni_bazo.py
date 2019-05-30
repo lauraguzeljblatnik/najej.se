@@ -345,6 +345,7 @@ def pravice():
         GRANT ALL ON SCHEMA public TO lauragb;
         GRANT CONNECT ON DATABASE sem2019_klarag TO javnost;
         GRANT USAGE ON SCHEMA public TO javnost;
+        GRANT ALL ON SCHEMA public TO javnost;
         GRANT SELECT ON ALL TABLES IN SCHEMA public TO javnost;
         GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO javnost;
     """)
@@ -362,7 +363,6 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 izbrisi()
 
-pravice()
 ustvari_uporabnik()
 ustvari_sestavina()
 ustvari_vrsta()
@@ -377,3 +377,4 @@ ustvari_vrsta_recepta()
 
 uvozi("recepti.csv", "sestavina.csv")
 
+pravice()
