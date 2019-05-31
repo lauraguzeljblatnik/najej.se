@@ -112,8 +112,13 @@ def static(filename):
 
 @get('/')
 def index():
-    cur.execute("SELECT * FROM recept")
+    cur.execute("SELECT * FROM recept ORDER BY id DESC LIMIT 5")
     return template('glavna.html', recept=cur)
+
+@get('/recepti')
+def index():
+    cur.execute("SELECT * FROM recept")
+    return template('recepti.html', recept=cur)
 
 @get("/login")
 def login():

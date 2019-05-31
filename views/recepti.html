@@ -1,1 +1,17 @@
-%rebase('osnova.html', naslov='Najej.se') 
+%rebase('osnova.html', naslov='Najej.se')
+
+ <table cellpadding="0" cellspacing="0" border="1">
+  <tr>
+     <th>ID</th>
+  </tr>
+  %for (id, ime, opis, postopek, datum_objave, ocena, cas, uporabnik) in recept :
+    <tr>
+		<td>{{id}}</td>
+       <td>{{ime}}</td>
+       <td>{{opis}}</td>
+       <td>{{uporabnik}}</td>
+       <td>{{datum_objave}}</td>
+       <td>{{cas}}</td>
+    </tr>
+  %end
+  </table>
