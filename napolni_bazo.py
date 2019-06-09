@@ -346,7 +346,7 @@ def pravice():
         GRANT CONNECT ON DATABASE sem2019_klarag TO javnost;
         GRANT USAGE ON SCHEMA public TO javnost;
         GRANT ALL ON SCHEMA public TO javnost;
-        GRANT SELECT ON ALL TABLES IN SCHEMA public TO javnost;
+        GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO javnost;
         GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO javnost;
     """)
     print("dodane pravice")
@@ -361,20 +361,20 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 #KLICANJE FUNKCIJ
 
-izbrisi()
-
-ustvari_uporabnik()
-ustvari_sestavina()
-ustvari_vrsta()
-ustvari_priprava()
-ustvari_priloznost()
-ustvari_recept()
-ustvari_komentar()
-ustvari_vsebuje()
-ustvari_priprava_recepta()
-ustvari_priloznost_recepta()
-ustvari_vrsta_recepta()
-
-uvozi("recepti.csv", "sestavina.csv")
+##izbrisi()
+##
+##ustvari_uporabnik()
+##ustvari_sestavina()
+##ustvari_vrsta()
+##ustvari_priprava()
+##ustvari_priloznost()
+##ustvari_recept()
+##ustvari_komentar()
+##ustvari_vsebuje()
+##ustvari_priprava_recepta()
+##ustvari_priloznost_recepta()
+##ustvari_vrsta_recepta()
+##
+##uvozi("recepti.csv", "sestavina.csv")
 
 pravice()

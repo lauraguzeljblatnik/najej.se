@@ -18,12 +18,15 @@ body {
   left: 0;
   bottom: 0;
   right: 0;
+  height: 40px;
 }
 
-/* Other Classes for Page Styling */
+container{
+ margin-block-end: 60px;
+}
 
-body {
-
+.text-center {
+ margin-block-end: 60px;
 }
 
 body::after {
@@ -34,6 +37,25 @@ body::after {
   left: 0;
   bottom: 0;
   right: 0;
-  position: absolute;
+  position: fixed;
   z-index: -1;   
+}
+
+.btn-primary { 
+background-color: #F0B27A; 
+border-color: #F0B27A;
+}
+
+.btn-primary:hover { 
+  background-color: #E67E22;
+  border-color: #E67E22;
+}
+
+.btn-primary:active { 
+  background-color: #E67E22;
+  border-color: #E67E22;
+}
+
+table {
+    margin-bottom: 60px;
 }

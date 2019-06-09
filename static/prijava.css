@@ -29,3 +29,8 @@ border-color: #F0B27A;
   border-color: #E67E22;
 }
 
+.btn-primary:active { 
+  background-color: #E67E22;
+  border-color: #E67E22;
+}
+

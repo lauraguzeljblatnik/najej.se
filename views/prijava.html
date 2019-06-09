@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-	<link rel="icon" href="../static/hat.ico">
+	<link rel="icon" href="/static/hat.ico">
 
 
     <title>Najej.se prijava</title>
@@ -15,7 +15,7 @@
     <!-- Bootstrap core CSS -->
    
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-	<link href="../static/prijava.css" rel="stylesheet">
+	<link href="/static/prijava.css" rel="stylesheet">
 
    <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 -->
@@ -41,28 +41,26 @@
         <div class="card card-signin my-5">
           <div class="card-body">
             <h5 class="card-title text-center">Pozdravljeni!</h5>
-
-            <form class="form-signin" method = "post" action="glavna.html">
+			%if napaka:
+				<div class="alert alert-warning">{{napaka}}</div>
+			%end
+            <form class="form-signin" role="form" method="post" action=".">
               <div class="form-label-group">
-                <input type="username" id="inputUsername" class="form-control" placeholder="Uporabniško ime" name="username">
+                <input type="username" class="form-control" placeholder="Uporabniško ime" name="username">
                 <label for="inputUsername"></label>
               </div>
 
               <div class="form-label-group">
-                <input type="password" id="inputPassword" class="form-control" placeholder="Geslo" required>
+                <input type="password" class="form-control" placeholder="Geslo" name="password" required>
                 <label for="inputPassword"></label>
               </div>
 			  
-			%if napaka:
-				<div class="alert alert-warning">{{napaka}}</div>
-			%end
-
 
               <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Prijava</button>
 			  <label for="prijava"></label>
 
 			   <div>
-				<a class="btn btn-lg btn-primary btn-block text-uppercase" href="registracija.html">Registracija</a>
+				<a class="btn btn-lg btn-primary btn-block text-uppercase" href="/register">Registracija</a>
 				</div>
            
             </form>

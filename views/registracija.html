@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-	<link rel="icon" href="../static/hat.ico">
+	<link rel="icon" href="/static/hat.ico">
 
 
     <title>Najej.se registracija</title>
@@ -15,7 +15,7 @@
     <!-- Bootstrap core CSS -->
    
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-	<link href="../static/prijava.css" rel="stylesheet">
+	<link href="/static/prijava.css" rel="stylesheet">
 
    <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 -->
@@ -40,10 +40,19 @@
         <div class="card card-signin my-5">
           <div class="card-body">
             <h5 class="card-title text-center">Registracija</h5>
+		
+		%if napaka:
+        <div class="alert alert-warning">{{napaka}}</div>
+        %end
 
-            <form class="form-signin" method = "post" action="glavna.html">
+            <form class="form-signin"  role="form" method="post" action=".">
               <div class="form-label-group">
-                <input type="username" id="inputUsername" class="form-control" placeholder="Uporabniško ime" name="username" required autofocus>
+                <input type="username" id="inputUsername" class="form-control" placeholder="Uporabniško ime" 
+				%if username:
+               value="{{username}}"
+               %end
+               name="username"
+			required autofocus>
                 <label for="inputUsername"></label>
               </div>
 			  
@@ -57,9 +66,6 @@
                 <label for="inputPassword"></label>
               </div>
 			  
-			<!--%if napaka:
-				<div class="alert alert-warning">{{napaka}}</div>
-			%end -->
 
 
               <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Naj se kuhanje začne!</button>

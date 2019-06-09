@@ -23,8 +23,6 @@ secret = "to skrivnost je zelo tezko uganiti 1094107c907cw982982c42"
 #odkomentiraj, če želiš sporočila o napakah
 debug(True)
 
-#statične datoteke
-static_dir = "./static"
 
 ##########################################################################
 # Pomožne funkcije
@@ -86,14 +84,12 @@ def get_user():
        na stran za prijavo ali vrni None (advisno od auto_login).
     """
     # Dobimo username iz piškotka
-    username = bottle.request.get_cookie('username', secret=secret)
+    username = request.get_cookie('username', secret=secret)
     # Preverimo, ali ta uporabnik obstaja
     if username is not None:
-        c = baza.cursor()
-        c.execute("SELECT ime FROM uporabnik WHERE ime=%s",
+        cur.execute("SELECT ime FROM uporabnik WHERE ime=%s",
                   [username])
-        r = c.fetchone()
-        c.close ()
+        r = cur.fetchone()
         if r is not None:
             # uporabnik obstaja, vrnemo njegove podatke
             return r
@@ -108,11 +104,11 @@ def get_user():
 
 @get('/static/<filename:path>')
 def static(filename):
-    return static_file(filename, root='static_dir')
+    return static_file(filename, root='static')
 
 @get('/')
 def index():
-    cur.execute("SELECT * FROM recept ORDER BY id DESC LIMIT 5")
+    cur.execute("SELECT * FROM recept ORDER BY id DESC LIMIT 8")
     return template('glavna.html', recept=cur)
 
 @get('/recepti')
@@ -126,15 +122,63 @@ def login():
     return template("prijava.html",
                            napaka=None)
 
-@get("/logout")
+@post("/login")
+def login_post():
+    """Obdelaj izpolnjeno formo za prijavo"""
+    # Uporabniško ime, ki ga je uporabnik vpisal v formo
+    username = request.forms.username
+    # Izračunamo MD5 has gesla, ki ga bomo spravili
+    password = password_md5(request.forms.password)
+    # Preverimo, ali se je uporabnik pravilno prijavil
+    cur.execute("SELECT * FROM uporabnik WHERE ime=%s AND geslo=%s",
+              [username, password])
+    if cur.fetchone() is None:
+        # Username in geslo se ne ujemata
+        return template("prijava.html",
+                               napaka="Nepravilna prijava")
+    else:
+        # Vse je v redu, nastavimo cookie in preusmerimo na glavno stran
+        response.set_cookie('username', username, path='/', secret=secret)
+    redirect("/")
+
+@get('/logout')
 def logout():
     """Pobriši cookie in preusmeri na login."""
     response.delete_cookie('username')
-    redirect('/login/')
+    redirect('/login')
 
 @get('/register')
 def register():
-    return template("registracija.html", napaka=None)
+    return template("registracija.html", napaka=None, username=None)
+
+@post("/register")
+def register_post():
+    """Registriraj novega uporabnika."""
+    username = request.forms.username
+    print(username)
+    password1 = request.forms.password1
+    password2 = request.forms.password2
+    # Ali uporabnik že obstaja?
+    cur.execute("SELECT * FROM uporabnik WHERE ime=%s", [username])
+    if cur.fetchone():
+        # Uporabnik že obstaja
+        return template("registracija.html",
+                               username=username,
+                               napaka='To uporabniško ime je že zavzeto')
+    elif not password1 == password2:
+        # Geslo se ne ujemata
+        return template("registracija.html",
+                               username=username,
+                               napaka='Gesli se ne ujemata')
+    else:
+        # Vse je v redu, vstavi novega uporabnika v bazo
+        password = password_md5(password1)
+        cur.execute("INSERT INTO uporabnik (ime, skor, geslo) VALUES (%s, %s, %s)",
+                  (username, 0, password))
+        conn.commit()
+        # Daj uporabniku cookie
+        response.set_cookie('username', username, path='/', secret=secret)
+        redirect("/")
 
 ##@get('/transakcije/:x/')
 ##def transakcije(x):
