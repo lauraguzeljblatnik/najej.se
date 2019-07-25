@@ -40,11 +40,12 @@
       <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
         <div class="card card-signin my-5">
           <div class="card-body">
+		  <form class="form-signin" role="form" method="post" action=".">
             <h5 class="card-title text-center">Pozdravljeni!</h5>
 			%if napaka:
 				<div class="alert alert-warning">{{napaka}}</div>
 			%end
-            <form class="form-signin" role="form" method="post" action=".">
+            
               <div class="form-label-group">
                 <input type="username" class="form-control" placeholder="Uporabniško ime" name="username">
                 <label for="inputUsername"></label>
@@ -60,7 +61,7 @@
 			  <label for="prijava"></label>
 
 			   <div>
-				<a class="btn btn-lg btn-primary btn-block text-uppercase" href="/register">Registracija</a>
+				<a class="btn btn-lg btn-primary btn-block text-uppercase" href="/registracija">Registracija</a>
 				</div>
            
             </form>

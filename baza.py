@@ -17,12 +17,25 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo prob
 #kriptografija za gesla
 import hashlib 
 
-# Skrivnost za kodiranje cookijev
-secret = "to skrivnost je zelo tezko uganiti 1094107c907cw982982c42"
 
+
+
+
+#########################################################################
+#konfiguracija
+
+#Da se bodo predloge same osvežile in da bomo dobivali lepa sporocila o napakah
 #odkomentiraj, če želiš sporočila o napakah
 debug(True)
 
+#datoteka v kateri je baza
+baza_datoteka = "napolni_bazo"
+
+#Mapa s staticnimi datotekami
+static_dir = "./static"
+
+# Skrivnost za kodiranje cookijev
+secret = "to skrivnost je zelo tezko uganiti 1094107c907cw982982c42"
 
 ##########################################################################
 # Pomožne funkcije
@@ -101,6 +114,8 @@ def get_user():
 
 
 ########################################################################
+# Server
+
 
 @get('/static/<filename:path>')
 def static(filename):
@@ -116,13 +131,14 @@ def index():
     cur.execute("SELECT * FROM recept")
     return template('recepti.html', recept=cur)
 
-@get("/login")
+@get("/prijava")
 def login():
     """Serviraj formo za login."""
     return template("prijava.html",
                            napaka=None)
 
-@post("/login")
+
+@post("/prijava")
 def login_post():
     """Obdelaj izpolnjeno formo za prijavo"""
     # Uporabniško ime, ki ga je uporabnik vpisal v formo
@@ -135,7 +151,8 @@ def login_post():
     if cur.fetchone() is None:
         # Username in geslo se ne ujemata
         return template("prijava.html",
-                               napaka="Nepravilna prijava")
+                               napaka="Nepravilna prijava",
+                        username = username)
     else:
         # Vse je v redu, nastavimo cookie in preusmerimo na glavno stran
         response.set_cookie('username', username, path='/', secret=secret)
@@ -147,11 +164,11 @@ def logout():
     response.delete_cookie('username')
     redirect('/login')
 
-@get('/register')
+@get('/registracija')
 def register():
     return template("registracija.html", napaka=None, username=None)
 
-@post("/register")
+@post("/registracija")
 def register_post():
     """Registriraj novega uporabnika."""
     username = request.forms.username
