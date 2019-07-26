@@ -105,10 +105,8 @@ def get_user():
         r = cur.fetchone()
         if r is not None:
             # uporabnik obstaja, vrnemo njegove podatke
-            return r
+            return username
     # Če pridemo do sem, uporabnik ni prijavljen, naredimo redirect
-    if auto_login:
-        bottle.redirect('/login/')
     else:
         return None
 
@@ -123,13 +121,15 @@ def static(filename):
 
 @get('/')
 def index():
+    username = get_user()
     cur.execute("SELECT * FROM recept ORDER BY id DESC LIMIT 8")
-    return template('glavna.html', recept=cur)
+    return template('glavna.html', username = username, recept=cur)
 
 @get('/recepti')
 def index():
+    username = get_user()
     cur.execute("SELECT * FROM recept")
-    return template('recepti.html', recept=cur)
+    return template('recepti.html', username = username, recept=cur)
 
 @get("/prijava")
 def login():
@@ -162,7 +162,7 @@ def login_post():
 def logout():
     """Pobriši cookie in preusmeri na login."""
     response.delete_cookie('username')
-    redirect('/login')
+    redirect("/")
 
 @get('/registracija')
 def register():
@@ -196,6 +196,8 @@ def register_post():
         # Daj uporabniku cookie
         response.set_cookie('username', username, path='/', secret=secret)
         redirect("/")
+
+
 
 ##@get('/transakcije/:x/')
 ##def transakcije(x):

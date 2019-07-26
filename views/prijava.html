@@ -40,19 +40,19 @@
       <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
         <div class="card card-signin my-5">
           <div class="card-body">
-		  <form class="form-signin" role="form" method="post" action=".">
+		  <form class="form-signin" role="form" method="post">
             <h5 class="card-title text-center">Pozdravljeni!</h5>
 			%if napaka:
 				<div class="alert alert-warning">{{napaka}}</div>
 			%end
             
               <div class="form-label-group">
-                <input type="username" class="form-control" placeholder="Uporabniško ime" name="username">
+                <input type="username" class="form-control" placeholder="Uporabniško ime" name="username" required autofocus>
                 <label for="inputUsername"></label>
               </div>
 
               <div class="form-label-group">
-                <input type="password" class="form-control" placeholder="Geslo" name="password" required>
+                <input type="password" class="form-control" placeholder="Geslo" name="password" required autofocus>
                 <label for="inputPassword"></label>
               </div>
 			  

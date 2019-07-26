@@ -45,12 +45,10 @@
         <div class="alert alert-warning">{{napaka}}</div>
         %end
 
-            <form class="form-signin"  role="form" method="post" action=".">
+            <form class="form-signin"  role="form" method="post">
               <div class="form-label-group">
                 <input type="username" id="inputUsername" class="form-control" placeholder="Uporabniško ime" 
-				%if username:
-               value="{{username}}"
-               %end
+ 
                name="username"
 			required autofocus>
                 <label for="inputUsername"></label>

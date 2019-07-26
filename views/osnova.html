@@ -51,12 +51,18 @@
           <li class="nav-item">
             <a class="nav-link" href="recepti">Recepti</a>
           </li>
+          % if username:
+          <li class="nav-item">
+            <a class="nav-link" href="logout">Odjava</a>
+          </li>
+		   <li class="nav-item">
+            <a class="nav-link" href="profil">Moj profil</a>
+          </li>
+          % else:
           <li class="nav-item">
             <a class="nav-link" href="prijava">Prijava</a>
           </li>
-		   <li class="nav-item">
-            <a class="nav-link" href="recepti">Moj profil</a>
-          </li>
+          % end
         </ul>
       </div>
     </div>
