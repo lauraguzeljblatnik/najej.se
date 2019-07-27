@@ -126,7 +126,7 @@ def index():
     return template('glavna.html', username = username, recept=cur)
 
 @get('/recepti')
-def index():
+def recept():
     username = get_user()
     cur.execute("SELECT * FROM recept")
     return template('recepti.html', username = username, recept=cur)
@@ -197,29 +197,31 @@ def register_post():
         response.set_cookie('username', username, path='/', secret=secret)
         redirect("/")
 
+@get("/mojprofil")
+def profil():
+    """Prikaži stran uporabnika"""
+    username = get_user()
+    skor = 123456
+    return template("mojprofil.html", username = username, skor = skor, uporabnik = cur)
+
+@get("/dodajrecept")
+def dodajrecept():
+    username = get_user()
+    return template("dodajrecept.html", username = username)
+
+#to še popravi!!!!!
+@get('/recept/:x/')
+def recept(x):
+    username = get_user()
+    cur.execute("SELECT * FROM recept")
+    return template('recept.html', username = username)
+
+@get("/profil/<username>")
+def profil(username):
+    """Prikaži stran uporabnika"""
 
 
-##@get('/transakcije/:x/')
-##def transakcije(x):
-##    cur.execute("SELECT * FROM transakcija WHERE znesek > %s ORDER BY znesek, id", [int(x)])
-##    return template('transakcije.html', x=x, transakcije=cur)
-##
-##@get('/dodaj_transakcijo')
-##def dodaj_transakcijo():
-##    return template('dodaj_transakcijo.html', znesek='', racun='', opis='', napaka=None)
-##
-##@post('/dodaj_transakcijo')
-##def dodaj_transakcijo_post():
-##    znesek = request.forms.znesek
-##    racun = request.forms.racun
-##    opis = request.forms.opis
-##    try:
-##        cur.execute("INSERT INTO transakcija (znesek, racun, opis) VALUES (%s, %s, %s)",
-##                    (znesek, racun, opis))
-##    except Exception as ex:
-##        return template('dodaj_transakcijo.html', znesek=znesek, racun=racun, opis=opis,
-##                        napaka = 'Zgodila se je napaka: %s' % ex)
-##    redirect("/")  
+    return template("profil.html", username = username)    
 
 ######################################################################
 # Glavni program
