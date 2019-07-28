@@ -114,7 +114,6 @@ def get_user():
 ########################################################################
 # Server
 
-
 @get('/static/<filename:path>')
 def static(filename):
     return static_file(filename, root='static')
@@ -123,10 +122,10 @@ def static(filename):
 def index():
     username = get_user()
     cur.execute("SELECT * FROM recept ORDER BY id DESC LIMIT 8")
-    return template('glavna.html', username = username, recept=cur)
+    return template('glavna.html', username = username, recept = cur)
 
 @get('/recepti')
-def recept():
+def recepti():
     username = get_user()
     cur.execute("SELECT * FROM recept")
     return template('recepti.html', username = username, recept=cur)
@@ -202,19 +201,29 @@ def profil():
     """Prikaži stran uporabnika"""
     username = get_user()
     skor = 123456
-    return template("mojprofil.html", username = username, skor = skor, uporabnik = cur)
+    return template("mojprofil.html", username = username, skor = skor)
 
 @get("/dodajrecept")
 def dodajrecept():
     username = get_user()
     return template("dodajrecept.html", username = username)
 
+@get("/isci")
+def isci():
+    username = get_user()
+    return template("isci.html", username = username)
+
 #to še popravi!!!!!
-@get('/recept/:x/')
+@get('/recept/:x')
 def recept(x):
     username = get_user()
-    cur.execute("SELECT * FROM recept")
-    return template('recept.html', username = username)
+    cur.execute("SELECT * FROM recept WHERE id = %s", [int(x)])
+    recept = cur.fetchall()
+    cur.execute("SELECT uporabnik.ime FROM uporabnik JOIN recept ON uporabnik.id = recept.uporabnik WHERE recept.id = %s", [int(x)])
+    avtor = cur.fetchall()
+    avtor = avtor[0][0]
+    print(avtor)
+    return template('recept.html', username = username, x= x, recept = recept, avtor = avtor)
 
 @get("/profil/<username>")
 def profil(username):

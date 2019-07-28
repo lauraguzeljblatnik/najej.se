@@ -1,2 +1,14 @@
-%rebase('osnova.html', naslov='Najej.se')
+%rebase('osnova.html', naslov='recept{}'.format(x))
 
+%for (id, ime, opis, postopek, datum_objave, ocena, cas, uporabnik) in recept :
+<div class="container">
+    <div class="card border-0 shadow my-5">
+      <div class="card-body p-5">
+        <h1 class="font-weight-light" >{{ime}}</h1>
+        <h2 class="font-weight-light" >{{opis}}</h2>
+        AVTOR: <a href="/profil/{{uporabnik}}">{{avtor}}</a>
+        <p class="lead">{{postopek}}</p>
+      </div>
+    </div>
+</div>
+%end
