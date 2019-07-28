@@ -93,8 +93,7 @@ def pretty_date(time):
 
 def get_user():
     """Poglej cookie in ugotovi, kdo je prijavljeni uporabnik,
-       vrni njegov username in ime. Če ni prijavljen, presumeri
-       na stran za prijavo ali vrni None (advisno od auto_login).
+       vrni njegov username in ime. 
     """
     # Dobimo username iz piškotka
     username = request.get_cookie('username', secret=secret)
@@ -222,15 +221,15 @@ def recept(x):
     cur.execute("SELECT uporabnik.ime FROM uporabnik JOIN recept ON uporabnik.id = recept.uporabnik WHERE recept.id = %s", [int(x)])
     avtor = cur.fetchall()
     avtor = avtor[0][0]
-    print(avtor)
     return template('recept.html', username = username, x= x, recept = recept, avtor = avtor)
 
-@get("/profil/<username>")
-def profil(username):
+@get("/profil/:x")
+def profil(x):
     """Prikaži stran uporabnika"""
-
-
-    return template("profil.html", username = username)    
+    username = get_user()
+    cur.execute("SELECT * FROM uporabnik WHERE id = %s", [int(x)])
+    uporabnik = cur.fetchall()
+    return template("profil.html", username = username, x= x, uporabnik = uporabnik)    
 
 ######################################################################
 # Glavni program

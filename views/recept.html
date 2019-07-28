@@ -1,10 +1,42 @@
-%rebase('osnova.html', naslov='recept{}'.format(x))
+%rebase('osnova.html', naslov='recept {}'.format(x))
 
 %for (id, ime, opis, postopek, datum_objave, ocena, cas, uporabnik) in recept :
 <div class="container">
     <div class="card border-0 shadow my-5">
       <div class="card-body p-5">
-        <h1 class="font-weight-light" >{{ime}}</h1>
+        <h1 class="font-weight-light" >{{ime}}
+        %if ocena==1:
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+        %end
+        %if ocena==2:
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+
+        %end
+        %if ocena==3:
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+
+
+        %end
+        %if ocena==4:
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+
+        %end
+        %if ocena==5:
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+        <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+
+        %end
+        </h1> 
+
+
         <h2 class="font-weight-light" >{{opis}}</h2>
         AVTOR: <a href="/profil/{{uporabnik}}">{{avtor}}</a>
         <p class="lead">{{postopek}}</p>
