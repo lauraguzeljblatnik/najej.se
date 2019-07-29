@@ -1,10 +1,12 @@
 %rebase('osnova.html', naslov='Moj Profil')
 
+%for (id, ime, skor, geslo) in uporabnik:
 <div class="container">
-        <div class="card border-0 shadow my-5" style="height: 100%">
+        <div class="card border-0 shadow my-5">
           <div class="card-body p-5">
-            <h1 class="font-weight-light" style="height: 200px">
-            <img src="/static/chef.png" width="80" height="80" alt= username >{{username}}</h1>
+            <h1 class="mt-4">
+            <img src="/static/chef.png" width="80" height="80" alt= username >&nbsp;&nbsp;{{username}}</h1>
+            <p> </p>
             <p class="lead">SKOR: {{skor}} </p>
             <p class="lead">število receptov: !!!!! </p>
             <p class="lead"> DODAJ GUMB ZA MOJE RECEPTE</p>
@@ -13,3 +15,4 @@
           </div>
         </div>
 </div>
+%end

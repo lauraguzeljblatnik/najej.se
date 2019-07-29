@@ -199,8 +199,9 @@ def register_post():
 def profil():
     """Prikaži stran uporabnika"""
     username = get_user()
-    skor = 123456
-    return template("mojprofil.html", username = username, skor = skor)
+    cur.execute("SELECT * FROM uporabnik WHERE ime=%s", [username])
+    uporabnik = cur.fetchall()
+    return template("mojprofil.html", username = username, uporabnik = uporabnik)
 
 @get("/dodajrecept")
 def dodajrecept():
@@ -221,7 +222,14 @@ def recept(x):
     cur.execute("SELECT uporabnik.ime FROM uporabnik JOIN recept ON uporabnik.id = recept.uporabnik WHERE recept.id = %s", [int(x)])
     avtor = cur.fetchall()
     avtor = avtor[0][0]
-    return template('recept.html', username = username, x= x, recept = recept, avtor = avtor)
+    cur.execute("SELECT recept, ime FROM priloznost_recepta JOIN priloznost ON priloznost_recepta.priloznost= priloznost.id WHERE recept = %s", [int(x)])
+    priloznost = cur.fetchall()
+    cur.execute("SELECT recept, ime FROM priprava_recepta JOIN priprava ON priprava_recepta.priprava = priprava.id WHERE recept = %s", [int(x)])
+    priprava = cur.fetchall()
+    cur.execute("SELECT recept, ime FROM vrsta_recepta JOIN vrsta ON vrsta_recepta.vrsta = vrsta.id WHERE recept = %s", [int(x)])
+    vrsta = cur.fetchall()
+    return template('recept.html', username = username, x= x, recept = recept, avtor = avtor, priloznost = priloznost,
+    priprava = priprava, vrsta = vrsta)
 
 @get("/profil/:x")
 def profil(x):
