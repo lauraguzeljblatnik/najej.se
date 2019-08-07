@@ -8,6 +8,7 @@
 
 %for (id, ime, opis, postopek, datum_objave, ocena, cas, uporabnik) in recept :
 
+
 <!-- Page Content -->
 <div class="container">
     <div class="card border-0 shadow my-5">
@@ -72,15 +73,30 @@
       <!-- sestavine-->
       <h5>Sestavine: </h5>
 
-      <hr>
+			<table style="width:60%">
+			<ul>
+			%for (recept, ime, kolicina, enota) in sestavine:
+			  <tr> 
+				<td>
+					<li>{{ime}}</li>
+				</td>
+				<td>{{kolicina}} {{enota}}</td> 
+			  </tr>
+			%end
+			</ul>
+			</table>
+
+ 
+
 
       <!-- Post Content -->
-      <p class="lead">Navodila za pripravo:</p>
+      <h5>Navodila za pripravo:</h5>
 
       <p> {{postopek}} </p>
 
       <hr>
 
+	  
       <!-- Comments Form -->
       <div class="card my-4">
         <h5 class="card-header">Komentarji:</h5>

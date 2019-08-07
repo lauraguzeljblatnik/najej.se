@@ -228,8 +228,17 @@ def recept(x):
     priprava = cur.fetchall()
     cur.execute("SELECT recept, ime FROM vrsta_recepta JOIN vrsta ON vrsta_recepta.vrsta = vrsta.id WHERE recept = %s", [int(x)])
     vrsta = cur.fetchall()
+    cur.execute("SELECT recept, ime, kolicina, enota FROM vsebuje JOIN sestavina ON vsebuje.sestavina = sestavina.id WHERE recept = %s", [int(x)])
+    sestavine = cur.fetchall()
+
+
     return template('recept.html', username = username, x= x, recept = recept, avtor = avtor, priloznost = priloznost,
-    priprava = priprava, vrsta = vrsta)
+    priprava = priprava, vrsta = vrsta, sestavine = sestavine)
+
+
+
+
+
 
 @get("/profil/:x")
 def profil(x):
