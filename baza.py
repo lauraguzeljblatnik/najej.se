@@ -230,7 +230,6 @@ def recept(x):
     vrsta = cur.fetchall()
     cur.execute("SELECT recept, ime, kolicina, enota FROM vsebuje JOIN sestavina ON vsebuje.sestavina = sestavina.id WHERE recept = %s", [int(x)])
     sestavine = cur.fetchall()
-
     # komentariji
     cur.execute('''SELECT avtor, cas, vsebina FROM komentar WHERE recept= %s''', [int(x)])
     komentarji = cur.fetchall()
@@ -240,7 +239,7 @@ def recept(x):
 
 @post("/komentar/<x:int>/")
 def komentar(x):
-    """Vnesi no komentar"""
+    """Vnesi nov komentar"""
     username = get_user()
     komentar = request.forms.komentar
     #iz baze preberemo id uporabnika 
@@ -251,6 +250,27 @@ def komentar(x):
                     [id, komentar, int(x)])
     redirect("/recept/{0}".format(int(x)))
 
+
+#popravi se, bolje bi bilo da lahko oznacis zvezdice, namesto da vpises
+#stevilko za oceno. Ce bova pustile s stevilkam je potrbno dodati se meje za ocene
+#da ne smes dodati ocene visje od 5. 
+@post("/ocena/<x:int>/")
+def ocena(x):
+    """oceni recept"""
+    username = get_user()
+    ocenjeno = request.forms.ocena
+    ocenjeno = int(ocenjeno)
+    cur.execute("SELECT ocena FROM recept WHERE id = %s", [int(x)])
+    [[ocena]] = cur.fetchall()
+    ocena = int(ocena)
+    if ocena == 0:
+        nova_ocena = ocenjeno
+    else:
+        nova_ocena = int((ocenjeno + ocena)/2)
+    cur.execute("UPDATE recept SET ocena=%s WHERE id = %s", (nova_ocena, int(x)))
+    redirect("/recept/{0}".format(int(x)))
+    
+    
 
 @get("/profil/:x")
 def profil(x):
