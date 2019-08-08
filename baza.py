@@ -15,7 +15,9 @@ import psycopg2, psycopg2.extensions, psycopg2.extras
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
 
 #kriptografija za gesla
-import hashlib 
+import hashlib
+
+from datetime import date
 
 
 
@@ -203,10 +205,76 @@ def profil():
     uporabnik = cur.fetchall()
     return template("mojprofil.html", username = username, uporabnik = uporabnik)
 
+@get("/spremenigeslo")
+def spremenigeslo():
+    username = get_user()
+    return template("spremenigeslo.html", username=username)
+
+@post("/spremenigeslo")
+def spremenigeslo_post():
+    """Obdelaj formo za spreminjanje podatkov o uporabniku."""
+    # Kdo je prijavljen?
+    username = get_user()
+    # Staro geslo (je obvezno)
+    password1 = password_md5(request.forms.password1)
+    # Preverimo staro geslo
+    cur.execute ("SELECT 1 FROM uporabnik WHERE ime=%s AND geslo=%s",
+               [username, password1])
+    # Pokazali bomo eno ali več sporočil, ki jih naberemo v seznam
+    sporocila = []
+    if cur.fetchone():
+        # Geslo je ok
+        # spremenimo geslo
+        password2 = request.forms.password2
+        password3 = request.forms.password3
+        if password2 or password3:
+            # Preverimo, ali se gesli ujemata
+            if password2 == password3:
+                # Vstavimo v bazo novo geslo
+                password2 = password_md5(password2)
+                cur.execute ("UPDATE uporabnik SET geslo=%s WHERE ime = %s", [password2, username])
+                sporocila.append(("alert-success", "Spremenili ste geslo."))
+            else:
+                sporocila.append(("alert-danger", "Gesli se ne ujemata"))
+    else:
+        # Geslo ni ok
+        sporocila.append(("alert-danger", "Napačno staro geslo"))
+    # Prikažemo stran z uporabnikom, z danimi sporočili. Kot vidimo,
+    # lahko kar pokličemo funkcijo, ki servira tako stran
+    redirect("/mojprofil")
+
+
+
 @get("/dodajrecept")
 def dodajrecept():
     username = get_user()
     return template("dodajrecept.html", username = username)
+
+
+##dopolni!! Ugotovi kako bi vnesle setavine???
+@post("/dodajrecept")
+def dodajrecept_post():
+    username = get_user()
+    ime = request.forms.ime_recepta
+    opis = request.forms.opis
+    nacin_priprave = request.forms.nacin_priprave
+    priloznost = request.forms.priloznost
+    vrsta = request.forms.vrsta
+    postopek = request.forms.postopek
+    cas = request.forms.cas
+    #iz baze preberemo id uporabnika 
+    cur.execute("SELECT id FROM uporabnik WHERE ime=%s", [username])
+    [[id]] = cur.fetchall()
+    id = int(id)
+    ocena = 0
+    today = date.today()
+    cur.execute("INSERT INTO recept (ime, opis, postopek, datum_objave, ocena, uporabnik) VALUES (%s, %s, %s, %s, %s, %s)",
+                    [ime, opis, postopek, today, cas, ocena, id,])
+    redirect("/")
+    
+
+    
+
 
 @get("/isci")
 def isci():
@@ -248,6 +316,14 @@ def komentar(x):
     id = int(id)
     cur.execute('''INSERT INTO komentar (avtor, vsebina, recept) VALUES (%s, %s, %s)''',
                     [id, komentar, int(x)])
+    #za vsak komentar se uporabniku skor poveča za 1
+    #iz baze preberemo skor uporabnika
+    cur.execute("SELECT skor FROM uporabnik WHERE ime=%s", [username])
+    [[skor]] = cur.fetchall()
+    skor = int(skor)
+    #skor povečamo za 1
+    novi_skor = skor+1
+    cur.execute("UPDATE uporabnik SET skor=%s WHERE ime = %s", [novi_skor, username])
     redirect("/recept/{0}".format(int(x)))
 
 
@@ -259,16 +335,18 @@ def ocena(x):
     """oceni recept"""
     username = get_user()
     ocenjeno = request.forms.ocena
-    ocenjeno = int(ocenjeno)
+    ocenjeno = float(ocenjeno)
     cur.execute("SELECT ocena FROM recept WHERE id = %s", [int(x)])
     [[ocena]] = cur.fetchall()
-    ocena = int(ocena)
+    ocena = float(ocena)
     if ocena == 0:
         nova_ocena = ocenjeno
+        nova_ocena = int(nova_ocena)
     else:
         nova_ocena = int((ocenjeno + ocena)/2)
     cur.execute("UPDATE recept SET ocena=%s WHERE id = %s", (nova_ocena, int(x)))
     redirect("/recept/{0}".format(int(x)))
+
     
     
 
@@ -279,6 +357,8 @@ def profil(x):
     cur.execute("SELECT * FROM uporabnik WHERE id = %s", [int(x)])
     uporabnik = cur.fetchall()
     return template("profil.html", username = username, x= x, uporabnik = uporabnik)    
+
+
 
 ######################################################################
 # Glavni program
