@@ -231,13 +231,25 @@ def recept(x):
     cur.execute("SELECT recept, ime, kolicina, enota FROM vsebuje JOIN sestavina ON vsebuje.sestavina = sestavina.id WHERE recept = %s", [int(x)])
     sestavine = cur.fetchall()
 
+    # komentariji
+    cur.execute('''SELECT avtor, cas, vsebina FROM komentar WHERE recept= %s''', [int(x)])
+    komentarji = cur.fetchall()
 
     return template('recept.html', username = username, x= x, recept = recept, avtor = avtor, priloznost = priloznost,
-    priprava = priprava, vrsta = vrsta, sestavine = sestavine)
+    priprava = priprava, vrsta = vrsta, sestavine = sestavine, komentarji=komentarji)
 
-
-
-
+@post("/komentar/<x:int>/")
+def komentar(x):
+    """Vnesi no komentar"""
+    username = get_user()
+    komentar = request.forms.komentar
+    #iz baze preberemo id uporabnika 
+    cur.execute("SELECT id FROM uporabnik WHERE ime=%s", [username])
+    [[id]] = cur.fetchall()
+    id = int(id)
+    cur.execute('''INSERT INTO komentar (avtor, vsebina, recept) VALUES (%s, %s, %s)''',
+                    [id, komentar, int(x)])
+    redirect("/recept/{0}".format(int(x)))
 
 
 @get("/profil/:x")
