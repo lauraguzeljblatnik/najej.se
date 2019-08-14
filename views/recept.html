@@ -28,7 +28,7 @@
       <!-- Author -->
       <p class="lead">
         avtor: 
-        <a href="/profil/{{uporabnik}}">{{avtor}}</a>
+        <a href="/profil/{{uporabnik}}" style="color:#E67E22">{{avtor}}</a>
       </p>
 
       <hr>
@@ -55,6 +55,8 @@
                 <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
                 <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
                 <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+                <img src="/static/kapa.png" width="30"  alt= ocena  align="right">
+
         
                 %end
                 %if ocena==5:
@@ -100,22 +102,35 @@
       <!-- Comments Form -->
       <div class="card my-4">
         <h5 class="card-header">Komentarji:</h5>
+        % if username:
         <div class="card-body">
         <form method="post" action="/komentar/{{x}}/">
 		    <div class="form-group">
                <textarea class="komentar" name="komentar" rows="3" cols="80"></textarea>
-			</div>
+			  </div>
           <input type="submit" class="btn btn-primary" value="Komentiraj"/>
         </form>
         </div>
+        % end
       </div>
 
       <!-- Single Comment -->
-	  %for (avtor, cas, vsebina) in komentarji:
+    %for (avtor, ime, cas, vsebina) in komentarji:
       <div class="media mb-4">
-	    <img src="/static/chef.png" width="50" height="50" alt= username >&nbsp;&nbsp</h1>
+      %if username:
+        %if ime == username:
+          <a href="/mojprofil" style="color:#E67E22">
+            <img src="/static/chef.png" width="50" height="50" alt= username >&nbsp;&nbsp;
+      %else:
+      <a href="/profil/{{avtor}}" style="color:#E67E22">
+        <img src="/static/chef.png" width="50" height="50" alt= username >&nbsp;&nbsp; 
+      %end
+      %else:
+      <a href="/profil/{{avtor}}" style="color:#E67E22">
+        <img src="/static/chef.png" width="50" height="50" alt= username >&nbsp;&nbsp; 
+      %end
         <div class="media-body">
-          <h5 class="mt-0">{{username}}</h5> <p>{{cas}}</p>
+          <h5 class="mt-0">{{ime}}</h5></a> <p>{{cas}}</p>
 		  
           {{vsebina}}
 		  
@@ -140,7 +155,7 @@
             <div class="col-lg-6">
               <ul class="list-unstyled mb-0">
                 <li>
-                  <a href="#">{{ime}}</a>
+                  <a href="#" style="color:#E67E22">{{ime}}</a>
                 </li>
             
               </ul>
@@ -161,7 +176,7 @@
             <div class="col-lg-6">
               <ul class="list-unstyled mb-0">
                 <li>
-                  <a href="#">{{ime}}</a>
+                  <a href="#" style="color:#E67E22">{{ime}}</a>
                 </li>
             
               </ul>
@@ -182,7 +197,7 @@
             <div class="col-lg-6">
               <ul class="list-unstyled mb-0">
                 <li>
-                  <a href="#">{{ime}}</a>
+                  <a href="#" style="color:#E67E22">{{ime}}</a>
                 </li>
             
               </ul>
@@ -194,17 +209,23 @@
       %end
       
       <!-- Side Widget -->
+      % if username:
       <div class="card my-4">
         <h5 class="card-header">Oceni recept</h5>
         <div class="card-body">
           <form method="post" action="/ocena/{{x}}/">
-		    <div class="form-group">
+<!-- 		    <div class="form-group">
                <textarea class="ocena" name="ocena"></textarea>
-			</div>
-          <input type="submit" class="btn btn-primary" value="Oceni"/>
-        </form>
+			</div> -->
+      <button name="ocena" type="submit" class="btn btn-outline-dark" value="1">1</button>
+      <button name="ocena" type="submit" class="btn btn-outline-dark" value="2">2</button>
+      <button name="ocena" type="submit" class="btn btn-outline-dark" value="3">3</button>
+      <button name="ocena" type="submit" class="btn btn-outline-dark" value="4">4</button>
+      <button name="ocena" type="submit" class="btn btn-outline-dark" value="5">5</button>
+     </form>
         </div>
       </div>
+      %end
 	  
 	 
 	  

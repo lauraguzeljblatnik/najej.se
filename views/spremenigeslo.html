@@ -41,7 +41,9 @@
           <div class="card-body">
             <h5 class="card-title text-center">Spremeni geslo</h5>
 		
-
+            %if napaka:
+            <div class="alert alert-warning">{{napaka}}</div>
+            %end
 
             <form class="form-signin"  role="form" method="post">
               <div class="form-label-group">

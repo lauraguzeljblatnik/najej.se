@@ -128,7 +128,7 @@ def index():
 @get('/recepti')
 def recepti():
     username = get_user()
-    cur.execute("SELECT * FROM recept")
+    cur.execute("SELECT * FROM recept ORDER BY id DESC")
     return template('recepti.html', username = username, recept=cur)
 
 @get("/prijava")
@@ -172,7 +172,6 @@ def register():
 def register_post():
     """Registriraj novega uporabnika."""
     username = request.forms.username
-    print(username)
     password1 = request.forms.password1
     password2 = request.forms.password2
     # Ali uporabnik že obstaja?
@@ -183,7 +182,7 @@ def register_post():
                                username=username,
                                napaka='To uporabniško ime je že zavzeto')
     elif not password1 == password2:
-        # Geslo se ne ujemata
+        # Gesli se ne ujemata
         return template("registracija.html",
                                username=username,
                                napaka='Gesli se ne ujemata')
@@ -201,14 +200,33 @@ def register_post():
 def profil():
     """Prikaži stran uporabnika"""
     username = get_user()
-    cur.execute("SELECT * FROM uporabnik WHERE ime=%s", [username])
-    uporabnik = cur.fetchall()
-    return template("mojprofil.html", username = username, uporabnik = uporabnik)
+    cur.execute("SELECT COUNT(*) FROM recept JOIN uporabnik ON uporabnik.id = recept.uporabnik WHERE uporabnik.ime=%s", [username])
+    [[st_receptov]] = cur.fetchall()
+    cur.execute("SELECT id FROM uporabnik WHERE ime=%s", [username])
+    [[id_upo]] = cur.fetchall()
+    cur.execute("SELECT (skor) FROM uporabnik WHERE ime=%s", [username])
+    [[skor]] = cur.fetchall()
+    if skor == 0:
+        skor = st_receptov
+        cur.execute("SELECT ocena FROM recept JOIN uporabnik ON uporabnik.id = recept.uporabnik WHERE uporabnik.ime=%s", [username])
+    vse_ocene = cur.fetchall()
+    print(vse_ocene)
+    povp_ocena = 0
+    nenicelne = 0
+    for ocena in vse_ocene:
+        if ocena[0] != 0:
+            povp_ocena += ocena[0]
+            nenicelne += 1
+    if nenicelne != 0:
+        povp_ocena = povp_ocena/nenicelne
+    else:
+        povp_ocena = None
+    return template("mojprofil.html", username = username, id_upo = id_upo, skor = skor, st_receptov = st_receptov, povp_ocena = povp_ocena)
 
 @get("/spremenigeslo")
 def spremenigeslo():
     username = get_user()
-    return template("spremenigeslo.html", username=username)
+    return template("spremenigeslo.html", username=username, napaka=None)
 
 @post("/spremenigeslo")
 def spremenigeslo_post():
@@ -233,16 +251,20 @@ def spremenigeslo_post():
                 # Vstavimo v bazo novo geslo
                 password2 = password_md5(password2)
                 cur.execute ("UPDATE uporabnik SET geslo=%s WHERE ime = %s", [password2, username])
+                conn.commit()
                 sporocila.append(("alert-success", "Spremenili ste geslo."))
             else:
-                sporocila.append(("alert-danger", "Gesli se ne ujemata"))
+                return template("spremenigeslo.html",
+            username=username,
+            napaka='Gesli se ne ujemata')
     else:
         # Geslo ni ok
-        sporocila.append(("alert-danger", "Napačno staro geslo"))
+        return template("spremenigeslo.html",
+            username=username,
+            napaka='Napačno staro geslo')
     # Prikažemo stran z uporabnikom, z danimi sporočili. Kot vidimo,
     # lahko kar pokličemo funkcijo, ki servira tako stran
     redirect("/mojprofil")
-
 
 
 @get("/dodajrecept")
@@ -270,9 +292,15 @@ def dodajrecept_post():
     today = date.today()
     cur.execute("INSERT INTO recept (ime, opis, postopek, datum_objave, ocena, uporabnik) VALUES (%s, %s, %s, %s, %s, %s)",
                     [ime, opis, postopek, today, cas, ocena, id,])
+    #če dodaš recept se ti poveča skor
+    #iz baze preberemo skor uporabnika
+    cur.execute("SELECT skor FROM uporabnik WHERE ime=%s", [username])
+    [[skor]] = cur.fetchall()
+    skor = int(skor)
+    #skor povečamo za 1
+    novi_skor = skor+1
+    cur.execute("UPDATE uporabnik SET skor=%s WHERE ime = %s", [novi_skor, username])
     redirect("/")
-    
-
     
 
 
@@ -281,7 +309,6 @@ def isci():
     username = get_user()
     return template("isci.html", username = username)
 
-#to še popravi!!!!!
 @get('/recept/:x')
 def recept(x):
     username = get_user()
@@ -298,8 +325,8 @@ def recept(x):
     vrsta = cur.fetchall()
     cur.execute("SELECT recept, ime, kolicina, enota FROM vsebuje JOIN sestavina ON vsebuje.sestavina = sestavina.id WHERE recept = %s", [int(x)])
     sestavine = cur.fetchall()
-    # komentariji
-    cur.execute('''SELECT avtor, cas, vsebina FROM komentar WHERE recept= %s''', [int(x)])
+    # komentariji - ok :)
+    cur.execute("SELECT avtor, ime, cas, vsebina FROM komentar JOIN uporabnik ON uporabnik.id = komentar.avtor WHERE recept= %s", [int(x)])
     komentarji = cur.fetchall()
 
     return template('recept.html', username = username, x= x, recept = recept, avtor = avtor, priloznost = priloznost,
@@ -327,14 +354,13 @@ def komentar(x):
     redirect("/recept/{0}".format(int(x)))
 
 
-#popravi se, bolje bi bilo da lahko oznacis zvezdice, namesto da vpises
-#stevilko za oceno. Ce bova pustile s stevilkam je potrbno dodati se meje za ocene
-#da ne smes dodati ocene visje od 5. 
+
 @post("/ocena/<x:int>/")
 def ocena(x):
     """oceni recept"""
     username = get_user()
     ocenjeno = request.forms.ocena
+    print(ocenjeno)
     ocenjeno = float(ocenjeno)
     cur.execute("SELECT ocena FROM recept WHERE id = %s", [int(x)])
     [[ocena]] = cur.fetchall()
@@ -345,6 +371,14 @@ def ocena(x):
     else:
         nova_ocena = int((ocenjeno + ocena)/2)
     cur.execute("UPDATE recept SET ocena=%s WHERE id = %s", (nova_ocena, int(x)))
+    #če oceniš recept se ti poveča skor
+    #iz baze preberemo skor uporabnika
+    cur.execute("SELECT skor FROM uporabnik WHERE ime=%s", [username])
+    [[skor]] = cur.fetchall()
+    skor = int(skor)
+    #skor povečamo za 1
+    novi_skor = skor+1
+    cur.execute("UPDATE uporabnik SET skor=%s WHERE ime = %s", [novi_skor, username])
     redirect("/recept/{0}".format(int(x)))
 
     
@@ -354,9 +388,30 @@ def ocena(x):
 def profil(x):
     """Prikaži stran uporabnika"""
     username = get_user()
-    cur.execute("SELECT * FROM uporabnik WHERE id = %s", [int(x)])
-    uporabnik = cur.fetchall()
-    return template("profil.html", username = username, x= x, uporabnik = uporabnik)    
+    cur.execute("SELECT ime FROM uporabnik WHERE id = %s", [int(x)])
+    [[ime]] = cur.fetchall()
+    cur.execute("SELECT COUNT(*) FROM recept JOIN uporabnik ON uporabnik.id = recept.uporabnik WHERE uporabnik.id=%s", [int(x)])
+    [[st_receptov]] = cur.fetchall()
+    cur.execute("SELECT (skor) FROM uporabnik WHERE id=%s", [int(x)])
+    [[skor]] = cur.fetchall()
+    if skor == 0:
+        skor = st_receptov
+    cur.execute("SELECT ocena FROM recept JOIN uporabnik ON uporabnik.id = recept.uporabnik WHERE uporabnik.id=%s", [int(x)])
+    vse_ocene = cur.fetchall()
+    print(vse_ocene)
+    povp_ocena = 0
+    nenicelne = 0
+    for ocena in vse_ocene:
+        if ocena[0] != 0:
+            povp_ocena += ocena[0]
+            nenicelne += 1
+    if nenicelne != 0:
+        povp_ocena = povp_ocena/nenicelne
+    else:
+        povp_ocena = None
+    
+    return template("profil.html", username = username, x= x, ime = ime, st_receptov = st_receptov, skor = skor,
+                        povp_ocena = povp_ocena)    
 
 
 
@@ -371,3 +426,11 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 # poženemo strežnik na portu 8080, glej http://localhost:8080/
 #dodaj na koncu reloader = True, sem izbirsala ker ni delalo
 run(host='localhost', port=8080)
+
+
+
+#TO DO:
+# iskanje
+# razvrsti recepte po: oceni, času objave, času priprave.... (stran /recepti)
+# recepti na stran, kako to narest, huda ideja drgač
+# recepti/id_osebe je treba narest aka vsi recepti neke osebe

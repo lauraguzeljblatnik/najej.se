@@ -1,16 +1,25 @@
 %rebase('osnova.html', naslov='uporabnik {}'.format(x))
 
-%for (id, ime, skor, geslo) in uporabnik :
+
 <div class="container">
         <div class="card border-0 shadow my-5" style="height: 100%">
           <div class="card-body p-5">
-            <h1 class=class="mt-4">
+            <h1 class="mt-4">
             <img src="/static/chef.png" width="80" height="80" alt= uporabnik >&nbsp;&nbsp;{{ime}}</h1>
             <p> </p>
-            <p class="lead">SKOR: ??? </p>
-            <p class="lead">število receptov: !!!!! </p>
-            <p class="lead"> </p>
+            <div class="col-md-4">
+            <p class="lead">SKOR: {{skor}} 
+              <br>
+            število receptov: {{st_receptov}}
+            <br>
+            %if povp_ocena:
+            povprečna ocena recepta: {{povp_ocena}}
+            %end
+             </p>
+             <div>
+                <a class="lead"href="/recepti/{{x}}" style="color:#E67E22">Vsi recepti uporabnika {{ime}}</a>
+              </div>
+            </div>
           </div>
         </div>
 </div>
-%end

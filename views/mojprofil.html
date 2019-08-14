@@ -1,25 +1,35 @@
 %rebase('osnova.html', naslov='Moj Profil')
 
-%for (id, ime, skor, geslo) in uporabnik:
+
 <div class="container">
         <div class="card border-0 shadow my-5">
           <div class="card-body p-5">
             <h1 class="mt-4">
             <img src="/static/chef.png" width="80" height="80" alt= username >&nbsp;&nbsp;{{username}}</h1>
             <p> </p>
-            <p class="lead">SKOR: {{skor}} </p>
-            <p class="lead">število receptov: !!!!! </p>
-            <p class="lead">spremeni fotografijo</p>
+            <br>
+            <p class="lead">SKOR: {{skor}} 
+              <br>
+              število receptov: {{st_receptov}}
+              <br>
+            %if povp_ocena:
+             povprečna ocena recepta: {{povp_ocena}} 
+            %end  
+            </p>
+            
 			
 			<div>
-				<a class="lead"href="/dodajrecept">Dodaj recept</a>
-			</div>
+				<a class="lead"href="/dodajrecept" style="color:#E67E22">Dodaj recept</a>
+      </div>
+      <div>
+				<a class="lead"href="/recepti/{{id_upo}}" style="color:#E67E22">Vsi moji recepti</a>
+      </div>
 			<div>
-				<a class="lead"href="/spremenigeslo">Spremeni geslo</a>
-			</div>
+				<a class="lead"href="/spremenigeslo" style="color:#E67E22">Spremeni geslo</a>
+      </div>
 
 			
           </div>
         </div>
 </div>
-%end
+
