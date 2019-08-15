@@ -19,6 +19,8 @@ import hashlib
 
 from datetime import date
 
+#zaokroževanje
+import math
 
 
 
@@ -112,6 +114,17 @@ def get_user():
         return None
 
 
+#definiramo sezname z vsemi možnostmi razvrščanja:
+razvrsti_recepte = [('Novejši naprej', 'id DESC'),
+                       ('Starejši naprej', 'id ASC'),
+                       ('Ime recepta - od A do Ž', 'ime ASC'),
+                       ('Ime recepta - od Ž do A', 'ime DESC'),
+                       ('Padajoče glede na oceno', 'ocena DESC'),
+                       ('Naraščajoče glede na oceno', 'ocena ASC'),
+                        ('Padajoče glede na čas priprave', 'cas DESC'),
+                       ('Naraščajoče glede na čas priprave', 'cas ASC'),]
+
+st_stran = [('10 na stran'),('20 na stran'), ('50 na stran'), ('vsi')]                       
 ########################################################################
 # Server
 
@@ -129,7 +142,30 @@ def index():
 def recepti():
     username = get_user()
     cur.execute("SELECT * FROM recept ORDER BY id DESC")
-    return template('recepti.html', username = username, recept=cur)
+    return template('recepti.html', username = username, recept=cur, razvrsti = 0, 
+            moznosti_razvrscanje = razvrsti_recepte, st_na_stran = 3, moznosti_stran = st_stran,
+            st_strani = 1 )
+
+#št receptov na stran, to naredi!!!
+@post("/recepti")
+def recepti_post():
+    username = get_user()
+    #razvrscanje
+    raz = request.forms.razvrsti
+    raz = int(raz)
+    cur.execute("SELECT * FROM recept ORDER BY " + razvrsti_recepte[raz][1])
+    recept = cur.fetchall()
+    #st receptov na stran
+    #TO DO, to še ne dela!!!!
+    st_na_str = request.forms.st_na_stran
+    st_na_str = int(st_na_str)
+    #st vseh receptov
+    cur.execute("SELECT COUNT(*) FROM recept")
+    [[st_receptov]] = cur.fetchall()
+    st_strani = math.ceil(st_receptov/(st_na_str+1))
+    return template('recepti.html', username = username, recept = recept,
+             razvrsti = raz, moznosti_razvrscanje = razvrsti_recepte, st_na_stran = 3, moznosti_stran = st_stran,
+             st_receptov =  st_receptov, st_strani = st_strani) 
 
 @get("/prijava")
 def login():
