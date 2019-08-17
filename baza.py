@@ -117,14 +117,14 @@ def get_user():
 
 
 #definiramo sezname z vsemi možnostmi razvrščanja:
-razvrsti_recepte = [('Novejši naprej', 'id DESC'),
-                       ('Starejši naprej', 'id ASC'),
-                       ('Ime recepta - od A do Ž', 'ime ASC'),
-                       ('Ime recepta - od Ž do A', 'ime DESC'),
-                       ('Padajoče glede na oceno', 'ocena DESC'),
-                       ('Naraščajoče glede na oceno', 'ocena ASC'),
-                        ('Padajoče glede na čas priprave', 'cas DESC'),
-                       ('Naraščajoče glede na čas priprave', 'cas ASC')]
+razvrsti_recepte = [('Novejši naprej', 'recept.id DESC'),
+                       ('Starejši naprej', 'recept.id ASC'),
+                       ('Ime recepta - od A do Ž', 'recept.ime ASC'),
+                       ('Ime recepta - od Ž do A', 'recept.ime DESC'),
+                       ('Padajoče glede na oceno', 'recept.ocena DESC'),
+                       ('Naraščajoče glede na oceno', 'recept.ocena ASC'),
+                        ('Padajoče glede na čas priprave', 'recept.cas DESC'),
+                       ('Naraščajoče glede na čas priprave', 'recept.cas ASC')]
 
 st_stran = [('10 na stran'),('20 na stran'), ('50 na stran'), ('vsi')]
 
@@ -327,12 +327,12 @@ def dodajrecept_post():
     cas = int(cas)
     #iz baze preberemo id uporabnika 
     cur.execute("SELECT id FROM uporabnik WHERE ime=%s", [username])
-    [[id]] = cur.fetchall()
-    id = int(id)
+    [[up_id]] = cur.fetchall()
+    up_id = int(up_id)
     ocena = 0
     today = date.today()
     cur.execute("INSERT INTO recept (ime, opis, postopek, datum_objave, ocena, uporabnik) VALUES (%s, %s, %s, %s, %s, %s)",
-                    [ime, opis, postopek, today, cas, ocena, id,])
+                    [ime, opis, postopek, today, cas, ocena, up_id])
     #če dodaš recept se ti poveča skor
     #iz baze preberemo skor uporabnika
     cur.execute("SELECT skor FROM uporabnik WHERE ime=%s", [username])
@@ -365,36 +365,89 @@ def isci_post():
     ocena = request.forms.ocena
     #cas ne dela
     cas1 = request.forms.cas
-    print("CAS " +cas1)
     if (cas1) in ['0','1','2','3']:
         cas = mozni_casi[int(cas1)][1]
-        print("OK")
-        print (cas)
+
     else:
         cas = '0 AND 999999999999'
-    vrsta = request.forms.vrsta
-        #razvrscanje
+        #razvrscanje 
     raz = request.forms.razvrsti
     raz = int(raz)
+    sporocilo = None
     
+    ##vrsta
+    vrsta1 = request.forms.getall('vrsta')
+    vrsta = [(int(i) + 1) for i in vrsta1]
+    st_vrst = len(vrsta)
+    if st_vrst == 0:
+        isci_vrsta = ""
+    else:    
+        isci_vrsta = "AND vrsta_recepta.vrsta = " + str(vrsta[0])
+        for i in range(1,len(vrsta)):
+            isci_vrsta += " OR vrsta_recepta.vrsta = " + str(vrsta[i])
+
+    ##priloznost
+    priloznost1 = request.forms.getall('priloznost')
+    priloznost = [(int(i) + 1) for i in priloznost1]
+    st_pril = len(priloznost)
+    if st_pril == 0:
+        isci_pril = ""
+    else:
+        isci_pril = "AND priloznost_recepta.priloznost = " + str(priloznost[0])
+        for i in range(1,len(priloznost)):
+            isci_pril += " OR priloznost_recepta.priloznost = " + str(priloznost[i])
+
+    ##priprava
+    priprava1 = request.forms.getall('priprava')
+    priprava = [(int(i) + 1) for i in priprava1]
+    st_prip = len(priprava)
+    if st_prip == 0:
+        isci_prip = ""
+    else:
+        isci_prip = "AND priprava_recepta.priprava = " + str(priprava[0])
+        for i in range(1,len(priprava)):
+            isci_prip += " OR priprava_recepta.priprava = " + str(priprava[i])
 
     #testno - POPRAVI
-    cur.execute("SELECT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
+    cur.execute(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
         "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
-        #"JOIN vrsta ON vrsta_recepta.vrsta = vrsta.id  "
-        ""
+        "LEFT JOIN vrsta_recepta ON recept.id = vrsta_recepta.recept "
+        "LEFT JOIN priloznost_recepta ON recept.id = priloznost_recepta.recept "
+        "LEFT JOIN priprava_recepta ON recept.id = priprava_recepta.recept "
         "WHERE LOWER (recept.ime) LIKE '%'||'{}'||'%' "
         "AND ocena >= {} "
         "AND LOWER (uporabnik.ime) LIKE '%'||'{}'||'%' "
-        "AND cas BETWEEN {} ".format(naslov, ocena, avtor, cas))
-       # "ORDER BY" + razvrsti_recepte[raz][1].format(naslov, ocena, avtor, cas))
+        "AND cas BETWEEN {} "
+        "{} "
+        "{} "
+        "{} "
+        "ORDER BY " + razvrsti_recepte[raz][1]).format(
+            naslov, ocena, avtor, cas, isci_vrsta, isci_pril, isci_prip))
+    
+    print(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
+        "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
+        "LEFT JOIN vrsta_recepta ON recept.id = vrsta_recepta.recept "
+        "LEFT JOIN priloznost_recepta ON recept.id = priloznost_recepta.recept "
+        "LEFT JOIN priprava_recepta ON recept.id = priprava_recepta.recept "
+        "WHERE LOWER (recept.ime) LIKE '%'||'{}'||'%' "
+        "AND ocena >= {} "
+        "AND LOWER (uporabnik.ime) LIKE '%'||'{}'||'%' "
+        "AND cas BETWEEN {} "
+        "{} "
+        "{} "
+        "{} "
+        "ORDER BY " + razvrsti_recepte[raz][1]).format(
+            naslov, ocena, avtor, cas, isci_vrsta, isci_pril, isci_prip))
+
     recept = cur.fetchall()
+    if recept == []:
+        sporocilo = "NI ZADETKOV!"
     #st vseh receptov
     cur.execute("SELECT COUNT(*) FROM recept")
     [[st_receptov]] = cur.fetchall()
     return template('rezultati.html', username = username, recept = recept,
              razvrsti = raz, moznosti_razvrscanje = razvrsti_recepte, st_na_stran = 3, moznosti_stran = st_stran,
-             st_receptov =  st_receptov, st_strani = 1)
+             st_receptov =  st_receptov, st_strani = 1, sporocilo = sporocilo)
 
 @get('/recept/:x')
 def recept(x):

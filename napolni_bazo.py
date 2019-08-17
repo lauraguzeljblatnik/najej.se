@@ -265,7 +265,7 @@ def uvozi(recepti, sestavine, vrsta, priloznost, priprava):
 
                         #priprava
                         pom_prip = []
-                        for r in vrs_vrst:
+                        for r in vrs_prip:
                             if len(r) == 0:
                                 continue
                             id_recepta = r[0].split(',')

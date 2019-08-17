@@ -2,12 +2,15 @@
 
 <!-- Page Content -->
 <div class="container py-5">
-
-
-        
-
-
-
+%if sporocilo: 
+    <div class="card h-100">
+      <div class="card-body">     
+         <h1>{{sporocilo}}</h1>
+         <img src="/static/sad.gif" alt=":(">
+      </div>
+    </div>
+  %end
+  
 	%for (id, ime, opis, uporabnik) in recept :
       
   
@@ -30,7 +33,7 @@
 
   
 
-      <!-- Pagination -->
+      <!-- Pagination 
       <ul class="pagination justify-content-center">
         <li class="page-item">
           <a class="page-link" href="#" aria-label="Previous">
@@ -51,7 +54,7 @@
         </li>
       </ul>
       <br>
-      <br>
+      <br> -->
 
     </div>
     <!-- /.container -->
