@@ -28,8 +28,11 @@
       <!-- Author -->
       <p class="lead">
         avtor: 
-        <a href="/profil/{{uporabnik}}" style="color:#E67E22">{{avtor}}</a>
+        <a href="/profil/{{uporabnik}}" style="color:#E67E22">{{avtor}}</a> 
       </p>
+    
+  
+       
 
       <hr>
 
@@ -71,6 +74,13 @@
       </p>
 
       <hr>
+      <img src="/static/cas.png" width="30"  alt= ocena>
+        % if cas%60 ==0:
+         {{cas//60}} h
+         %else:
+         {{cas}} min
+         %end
+      <hr>
 
       <!-- sestavine-->
       <h5>Sestavine: </h5>
@@ -88,7 +98,7 @@
 			</ul>
 			</table>
 
- 
+      
 
 
       <!-- Post Content -->

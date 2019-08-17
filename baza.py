@@ -14,6 +14,8 @@ import datetime
 import psycopg2, psycopg2.extensions, psycopg2.extras
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
 
+import subprocess
+
 #kriptografija za gesla
 import hashlib
 
@@ -122,9 +124,12 @@ razvrsti_recepte = [('Novejši naprej', 'id DESC'),
                        ('Padajoče glede na oceno', 'ocena DESC'),
                        ('Naraščajoče glede na oceno', 'ocena ASC'),
                         ('Padajoče glede na čas priprave', 'cas DESC'),
-                       ('Naraščajoče glede na čas priprave', 'cas ASC'),]
+                       ('Naraščajoče glede na čas priprave', 'cas ASC')]
 
-st_stran = [('10 na stran'),('20 na stran'), ('50 na stran'), ('vsi')]                       
+st_stran = [('10 na stran'),('20 na stran'), ('50 na stran'), ('vsi')]
+
+mozni_casi = [('do 30min', '0 AND 30'),('30min - 1h','30 AND 60'),
+    ( '1h - 2h','60 AND 120'), ('2h ali več', ' 120 AND 10000000000000')]
 ########################################################################
 # Server
 
@@ -173,7 +178,6 @@ def login():
     return template("prijava.html",
                            napaka=None)
 
-
 @post("/prijava")
 def login_post():
     """Obdelaj izpolnjeno formo za prijavo"""
@@ -220,7 +224,7 @@ def register_post():
     elif not password1 == password2:
         # Gesli se ne ujemata
         return template("registracija.html",
-                               username=username,
+                               username=None,
                                napaka='Gesli se ne ujemata')
     else:
         # Vse je v redu, vstavi novega uporabnika v bazo
@@ -320,6 +324,7 @@ def dodajrecept_post():
     vrsta = request.forms.vrsta
     postopek = request.forms.postopek
     cas = request.forms.cas
+    cas = int(cas)
     #iz baze preberemo id uporabnika 
     cur.execute("SELECT id FROM uporabnik WHERE ime=%s", [username])
     [[id]] = cur.fetchall()
@@ -337,13 +342,59 @@ def dodajrecept_post():
     novi_skor = skor+1
     cur.execute("UPDATE uporabnik SET skor=%s WHERE ime = %s", [novi_skor, username])
     redirect("/")
-    
-
 
 @get("/isci")
 def isci():
     username = get_user()
-    return template("isci.html", username = username)
+    cur.execute("SELECT ime FROM vrsta")
+    vse_vrste = cur.fetchall()
+    cur.execute("SELECT ime FROM priloznost")
+    vse_priloznosti = cur.fetchall()
+    cur.execute("SELECT ime FROM priprava")
+    vse_priprave = cur.fetchall()
+
+    return template("isci.html", username = username, mozni_casi = mozni_casi, vse_vrste = vse_vrste,
+            vse_priloznosti = vse_priloznosti, vse_priprave = vse_priprave, moznosti_razvrscanje = razvrsti_recepte, razvrsti = 0)
+
+#to tudi še ne dela
+@post("/isci")
+def isci_post():
+    username = get_user()
+    naslov = request.forms.ime.lower()
+    avtor = request.forms.avtor.lower()
+    ocena = request.forms.ocena
+    #cas ne dela
+    cas1 = request.forms.cas
+    print("CAS " +cas1)
+    if (cas1) in ['0','1','2','3']:
+        cas = mozni_casi[int(cas1)][1]
+        print("OK")
+        print (cas)
+    else:
+        cas = '0 AND 999999999999'
+    vrsta = request.forms.vrsta
+        #razvrscanje
+    raz = request.forms.razvrsti
+    raz = int(raz)
+    
+
+    #testno - POPRAVI
+    cur.execute("SELECT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
+        "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
+        #"JOIN vrsta ON vrsta_recepta.vrsta = vrsta.id  "
+        ""
+        "WHERE LOWER (recept.ime) LIKE '%'||'{}'||'%' "
+        "AND ocena >= {} "
+        "AND LOWER (uporabnik.ime) LIKE '%'||'{}'||'%' "
+        "AND cas BETWEEN {} ".format(naslov, ocena, avtor, cas))
+       # "ORDER BY" + razvrsti_recepte[raz][1].format(naslov, ocena, avtor, cas))
+    recept = cur.fetchall()
+    #st vseh receptov
+    cur.execute("SELECT COUNT(*) FROM recept")
+    [[st_receptov]] = cur.fetchall()
+    return template('rezultati.html', username = username, recept = recept,
+             razvrsti = raz, moznosti_razvrscanje = razvrsti_recepte, st_na_stran = 3, moznosti_stran = st_stran,
+             st_receptov =  st_receptov, st_strani = 1)
 
 @get('/recept/:x')
 def recept(x):
@@ -452,6 +503,8 @@ def profil(x):
 
 
 ######################################################################
+# Glavni program
+
 # Glavni program
 
 # priklopimo se na bazo

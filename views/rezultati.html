@@ -1,0 +1,57 @@
+%rebase('osnova.html', naslov='Recepti')
+
+<!-- Page Content -->
+<div class="container py-5">
+
+
+        
+
+
+
+	%for (id, ime, opis, uporabnik) in recept :
+      
+  
+	 <div class="col-lg-9 col-md-6 mb-4 mx-auto">
+        <div class="card h-100">
+          <div class="card-body">
+            <h4 class="card-title">{{ime}}</h4>
+            <p class="card-text">{{opis}}</p>
+          </div>
+          <div class="card-footer">
+            <a href="/recept/{{id}}" class="btn btn-primary">Prikaži recept</a>
+          </div>
+        </div>
+      </div>
+      %end
+
+        </div>
+      
+
+
+  
+
+      <!-- Pagination -->
+      <ul class="pagination justify-content-center">
+        <li class="page-item">
+          <a class="page-link" href="#" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">Previous</span>
+          </a>
+        </li>
+        %for i in range(1,st_strani +1):
+        <li class="page-item">
+          <a class="page-link" href="/recepti/{{i}}">{{i}}</a>
+        </li>
+        %end
+        <li class="page-item">
+          <a class="page-link" href="#" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Next</span>
+          </a>
+        </li>
+      </ul>
+      <br>
+      <br>
+
+    </div>
+    <!-- /.container -->

@@ -5,36 +5,121 @@
       <div class="card-body p-5">
         <h1 class="mt-4"> Išči po receptih </h1>
         <br>
-        
-        <form class="form-horizontal" method ="post">
-          <div class="form-group">
-            <label for="ime_recepta" class="control-label">Ime recepta</label>
-            <select class="form-control" name="" id="ime">
 
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="type1" class="control-label">Avtor</label>
-            <select class="form-control" name="" id="type1">
-              
-              <option value="">Any</option>
-              <option value="">1</option>
-              <option value="">2</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="pricefrom" class="control-label">Ocena vsaj</label>
-            <div class="input-group">
-              <div class="input-group-addon" id="basic-addon1"></div>
-              <input type="text" class="form-control" id="pricefrom" aria-describedby="basic-addon1">
+        <form method ="post">
+            <div class="form-group row">
+              <label for="ime" class="col-sm-2 col-form-label">Naslov recepta</label>
+              <div class="col-sm-10">
+                  <input  id="ime" class="form-control" name="ime" placeholder="npr. Ajdovi štruklji">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="avtor" class="col-sm-2 col-form-label"> Avtor recepta </label>
+                <div class="col-sm-10">
+                <input  id="avtor" class="form-control" name="avtor" placeholder="npr. Vesna">
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="avtor" class="col-sm-2 col-form-label"> Sestavine </label>
+              <div class="col-sm-10">
+              <input  id="sestavine" class="form-control" name="sestavine" placeholder="npr. 1 jajce; 3kg moka">
             </div>
           </div>
-          <div class="form-group">
-            <label for="priceto" class="control-label">Čas priprave</label>
-            <div class="input-group">
-              <div class="input-group-addon" id="basic-addon2"></div>
-              <input type="text" class="form-control" id="priceto" aria-describedby="basic-addon1">
+
+            <div class="form-group row">
+                <label for="ocena" class="col-sm-2 col-form-label">Ocena vsaj</label>
+                <div class="col-sm-10">
+                <select class="form-control" name="ocena" id="ocena">
+                  <option value = 0>ni pomembno</option>
+                    %for i in range(1,6):
+                    <option value="{{i}}"    
+                    >{{i}}</option>
+                  %end
+                </select>
+                </div>
+              </div>
+
+            <fieldset class="form-group">
+              <div class="row">
+                <legend class="col-form-label col-sm-2 pt-0">Čas priprave</legend>
+                <div class="col-sm-10">
+                    <div class="form-check form-check-inline">
+                      %for i,(cas, _) in enumerate(mozni_casi):
+                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="{{i}}" name = "cas">
+                        <label class="form-check-label" for="inlineCheckbox1">{{cas}} </label> &nbsp;  &nbsp;
+                      %end
+                      </div>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-group">
+                <div class="row">
+                  <legend class="col-form-label col-sm-2 pt-0">Vrsta jedi</legend>
+                  <div class="col-sm-10">
+                      <div class="form-check form-check-inline">
+                        %for i,vrsta in enumerate(vse_vrste):
+                          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="{{i}}" name = "vrsta">
+                          <label class="form-check-label" for="inlineCheckbox1">{{vrsta[0]}} </label> &nbsp;  &nbsp;
+                        %end
+                        </div>
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset class="form-group">
+                <div class="row">
+                  <legend class="col-form-label col-sm-2 pt-0">Način priprave</legend>
+                  <div class="col-sm-10">
+                      <div class="form-check form-check-inline">
+                        %for i,priprava in enumerate(vse_priprave):
+                          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="{{i}}" name = "priprava">
+                          <label class="form-check-label" for="inlineCheckbox1">{{priprava[0]}} </label> &nbsp;  &nbsp;
+                        %end
+                        </div>
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset class="form-group">
+                <div class="row">
+                  <legend class="col-form-label col-sm-2 pt-0">Priložnost</legend>
+                  <div class="col-sm-10">
+                      <div class="form-check form-check-inline">
+                        %for i,priloznost in enumerate(vse_priloznosti):
+                          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="{{i}}" name = "priloznost">
+                          <label class="form-check-label" for="inlineCheckbox1">{{priloznost[0]}} </label> &nbsp;  &nbsp;
+                        %end
+                        </div>
+                  </div>
+                </div>
+              </fieldset>
+
+
+              <div class="form-group row">
+                <label for="razvrsti" class="col-sm-2 col-form-label">Razvrsti recepte glede na  </label>
+                <div class="col-sm-10">
+                <select class="form-control" name="razvrsti" id="razvrscanje">
+                    %for i, (raz, sql) in enumerate(moznosti_razvrscanje):
+                    <option value="{{i}}" 
+                    %if i == razvrsti:
+                    selected
+                    %end   
+                    >{{raz}}</option>
+                  %end
+                </select>
+               </div>
+               </div>
+            <div class="form-group row">
+              <div class="col-sm-10">
+                  <input type="submit" class="btn btn-primary" value="Išči"/>
+              </div>
             </div>
-          </div>
-          <input type="submit" class="btn btn-primary" value="Išči"/>
-        </form>
+          </form>
+        
+       
+
+               
+
