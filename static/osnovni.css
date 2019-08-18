@@ -59,6 +59,21 @@ border-color: #F0B27A;
   border-color: #E67E22;
 }
 
+.btn-default { 
+  border-color: #F0B27A;
+  background-color: #E67E22;
+  }
+  
+.btn-outline-secondary:hover { 
+    background-color: #E67E22;
+    border-color: #E67E22;
+  }
+  
+.btn-outline-secondary:active { 
+    background-color: #E67E22;
+    border-color: #E67E22;
+  }
+
 table {
     margin-bottom: 60px;
 }

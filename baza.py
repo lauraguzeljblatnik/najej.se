@@ -263,6 +263,28 @@ def profil():
         povp_ocena = None
     return template("mojprofil.html", username = username, id_upo = id_upo, skor = skor, st_receptov = st_receptov, povp_ocena = povp_ocena)
 
+@post("/mojprofil")
+def profil_post():
+    username = get_user()
+        #iskanje 
+    cur.execute(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
+        "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
+        "WHERE (uporabnik.ime) = '{}' "
+        "ORDER BY id DESC").format(username))
+    recept = cur.fetchall()
+    sporocilo = None
+    if recept == []:
+        sporocilo = "NISI ŠE DODAL RECEPTOV!"
+    #st vseh receptov
+    cur.execute("SELECT COUNT(*) FROM recept")
+    [[st_receptov]] = cur.fetchall()
+    return template('rezultati.html', username = username, recept = recept,
+             razvrsti = 0, moznosti_razvrscanje = razvrsti_recepte, st_na_stran = 3, moznosti_stran = st_stran,
+             st_receptov =  st_receptov, st_strani = 1, sporocilo = sporocilo)
+
+
+
+
 @get("/spremenigeslo")
 def spremenigeslo():
     username = get_user()
@@ -408,12 +430,24 @@ def isci_post():
         for i in range(1,len(priprava)):
             isci_prip += " OR priprava_recepta.priprava = " + str(priprava[i])
 
-    #testno - POPRAVI
+    #sestavine
+    sest1 = request.forms.sestavine.lower()
+    sestavine = sest1.split(',')
+    if len(sestavine) == 0:
+        isci_sest = ""
+    else:
+        isci_sest = "AND LOWER sestavina.ime = '{}'".format(str(sestavine[0]).strip(). lower())
+        for i in sestavine[1:]:
+            isci_sest += " OR LOWER sestavina.ime = '{}'".format(str(i).strip().LOWWER)
+
+    #iskanje 
     cur.execute(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
         "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
         "LEFT JOIN vrsta_recepta ON recept.id = vrsta_recepta.recept "
         "LEFT JOIN priloznost_recepta ON recept.id = priloznost_recepta.recept "
         "LEFT JOIN priprava_recepta ON recept.id = priprava_recepta.recept "
+        "JOIN vsebuje ON vsebuje.recept = recept.id "
+        "JOIN sestavina ON vsebuje.sestavina = sestavina.id "
         "WHERE LOWER (recept.ime) LIKE '%'||'{}'||'%' "
         "AND ocena >= {} "
         "AND LOWER (uporabnik.ime) LIKE '%'||'{}'||'%' "
@@ -421,25 +455,13 @@ def isci_post():
         "{} "
         "{} "
         "{} "
-        "ORDER BY " + razvrsti_recepte[raz][1]).format(
-            naslov, ocena, avtor, cas, isci_vrsta, isci_pril, isci_prip))
-    
-    print(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
-        "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
-        "LEFT JOIN vrsta_recepta ON recept.id = vrsta_recepta.recept "
-        "LEFT JOIN priloznost_recepta ON recept.id = priloznost_recepta.recept "
-        "LEFT JOIN priprava_recepta ON recept.id = priprava_recepta.recept "
-        "WHERE LOWER (recept.ime) LIKE '%'||'{}'||'%' "
-        "AND ocena >= {} "
-        "AND LOWER (uporabnik.ime) LIKE '%'||'{}'||'%' "
-        "AND cas BETWEEN {} "
-        "{} "
-        "{} "
         "{} "
         "ORDER BY " + razvrsti_recepte[raz][1]).format(
-            naslov, ocena, avtor, cas, isci_vrsta, isci_pril, isci_prip))
+            naslov, ocena, avtor, cas, isci_vrsta, isci_pril, isci_prip, isci_sest))
 
+    
     recept = cur.fetchall()
+
     if recept == []:
         sporocilo = "NI ZADETKOV!"
     #st vseh receptov
@@ -471,6 +493,45 @@ def recept(x):
 
     return template('recept.html', username = username, x= x, recept = recept, avtor = avtor, priloznost = priloznost,
     priprava = priprava, vrsta = vrsta, sestavine = sestavine, komentarji=komentarji)
+
+@post('/recept/:x')
+def recept(x):
+    username = get_user()
+    priprava = request.forms.priprava
+    priloznost = request.forms.priloznost
+    vrsta = request.forms.vrsta
+    print(priprava)
+    if priprava:
+        cur.execute(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
+        "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
+        "LEFT JOIN priprava_recepta ON recept.id = priprava_recepta.recept "
+        "JOIN priprava ON priprava_recepta.priprava = priprava.id "
+        "WHERE priprava.ime = '{}' "
+        "ORDER BY id DESC").format(priprava))
+    if vrsta:
+        cur.execute(("SELECT DISTINCT recept.id, recept.ime,  opis, uporabnik.ime FROM recept "
+        "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
+        "LEFT JOIN vrsta_recepta ON recept.id = vrsta_recepta.recept "
+        "JOIN vrsta ON vrsta_recepta.vrsta = vrsta.id "
+        "WHERE vrsta.ime = '{}' "
+        "ORDER BY id DESC").format(vrsta))        
+    if priloznost:
+        cur.execute(("SELECT DISTINCT recept.id, recept.ime,  opis, uporabnik.ime  FROM recept "
+        "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
+        "LEFT JOIN priloznost_recepta ON recept.id = priloznost_recepta.recept "
+        " JOIN priloznost ON priloznost_recepta.priloznost = priloznost.id "
+        "WHERE priloznost.ime = '{}' "
+        "ORDER BY id DESC").format(priloznost))
+    recept = cur.fetchall()
+    sporocilo = None
+    #st vseh receptov
+    cur.execute("SELECT COUNT(*) FROM recept")
+    [[st_receptov]] = cur.fetchall()
+    return template('rezultati.html', username = username, recept = recept,
+             razvrsti = 0, moznosti_razvrscanje = razvrsti_recepte, st_na_stran = 3, moznosti_stran = st_stran,
+             st_receptov =  st_receptov, st_strani = 1, sporocilo = sporocilo)
+
+
 
 @post("/komentar/<x:int>/")
 def komentar(x):
@@ -551,7 +612,26 @@ def profil(x):
         povp_ocena = None
     
     return template("profil.html", username = username, x= x, ime = ime, st_receptov = st_receptov, skor = skor,
-                        povp_ocena = povp_ocena)    
+                        povp_ocena = povp_ocena) 
+    
+@post("/profil/:x")
+def profil_post(x):
+    username = get_user()
+    #iskanje 
+    cur.execute(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
+        "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
+        "WHERE (uporabnik.id) = '{}' "
+        "ORDER BY id DESC").format(x))
+    recept = cur.fetchall()
+    sporocilo = None
+    if recept == []:
+        sporocilo = "UPORABNIK ŠE NI DODAL RECEPTOV!"
+    #st vseh receptov
+    cur.execute("SELECT COUNT(*) FROM recept")
+    [[st_receptov]] = cur.fetchall()
+    return template('rezultati.html', username = username, recept = recept,
+             razvrsti = 0, moznosti_razvrscanje = razvrsti_recepte, st_na_stran = 3, moznosti_stran = st_stran,
+             st_receptov =  st_receptov, st_strani = 1, sporocilo = sporocilo)
 
 
 
@@ -572,7 +652,6 @@ run(host='localhost', port=8080)
 
 
 #TO DO:
-# iskanje
-# razvrsti recepte po: oceni, času objave, času priprave.... (stran /recepti)
+# dodaj recepti
 # recepti na stran, kako to narest, huda ideja drgač
-# recepti/id_osebe je treba narest aka vsi recepti neke osebe
+
