@@ -9,6 +9,8 @@ import auth_public as auth
 
 #datumi in čas
 import datetime
+from datetime import datetime
+
 
 # uvozimo psycopg2
 import psycopg2, psycopg2.extensions, psycopg2.extras
@@ -162,15 +164,9 @@ def recepti_post():
     recept = cur.fetchall()
     #st receptov na stran
     #TO DO, to še ne dela!!!!
-    st_na_str = request.forms.st_na_stran
-    st_na_str = int(st_na_str)
-    #st vseh receptov
-    cur.execute("SELECT COUNT(*) FROM recept")
-    [[st_receptov]] = cur.fetchall()
-    st_strani = math.ceil(st_receptov/(st_na_str+1))
+
     return template('recepti.html', username = username, recept = recept,
-             razvrsti = raz, moznosti_razvrscanje = razvrsti_recepte, st_na_stran = 3, moznosti_stran = st_stran,
-             st_receptov =  st_receptov, st_strani = st_strani) 
+             razvrsti = raz, moznosti_razvrscanje = razvrsti_recepte, st_na_stran = 3, moznosti_stran = st_stran) 
 
 @get("/prijava")
 def login():
@@ -250,7 +246,6 @@ def profil():
         skor = st_receptov
         cur.execute("SELECT ocena FROM recept JOIN uporabnik ON uporabnik.id = recept.uporabnik WHERE uporabnik.ime=%s", [username])
     vse_ocene = cur.fetchall()
-    print(vse_ocene)
     povp_ocena = 0
     nenicelne = 0
     for ocena in vse_ocene:
@@ -332,18 +327,25 @@ def spremenigeslo_post():
 @get("/dodajrecept")
 def dodajrecept():
     username = get_user()
-    return template("dodajrecept.html", username = username)
+    return template("dodajrecept.html", username = username, opozorilo = None)
 
 
 ##dopolni!! Ugotovi kako bi vnesle setavine???
 @post("/dodajrecept")
 def dodajrecept_post():
     username = get_user()
+    if not username:
+        redirect("/")
     ime = request.forms.ime_recepta
+    cur.execute("SELECT COUNT(*) FROM recept WHERE ime = %s", [ime])
+    [[st_rec]] = cur.fetchall()
+   # if st_rec != 0:
+    #    opozorilo = "Recept s takim imenom že obstaja!"
+     #   return template("dodajrecept.html", username = username, opozorilo = opozorilo)
     opis = request.forms.opis
-    nacin_priprave = request.forms.nacin_priprave
-    priloznost = request.forms.priloznost
-    vrsta = request.forms.vrsta
+    priprava1 = request.forms.nacin_priprave
+    priloznost1 = request.forms.priloznost
+    vrsta1 = request.forms.vrsta
     postopek = request.forms.postopek
     cas = request.forms.cas
     cas = int(cas)
@@ -352,9 +354,85 @@ def dodajrecept_post():
     [[up_id]] = cur.fetchall()
     up_id = int(up_id)
     ocena = 0
-    today = date.today()
-    cur.execute("INSERT INTO recept (ime, opis, postopek, datum_objave, ocena, uporabnik) VALUES (%s, %s, %s, %s, %s, %s)",
-                    [ime, opis, postopek, today, cas, ocena, up_id])
+    now = datetime.now()
+    today = now.strftime('%Y-%m-%d')
+    cur.execute("SELECT id FROM recept ORDER BY id DESC LIMIT 1")
+    [[re]] = cur.fetchall()
+    recept_id =  int(re) + 1
+    print([recept_id, ime, opis, postopek, today, ocena, cas, up_id])
+    #cur.execute("INSERT INTO recept (id, ime, opis, postopek, datum_objave, ocena, cas, uporabnik) VALUES (%s,%s, %s, %s, %s, %s, %s, %s)",
+    #               [recept_id, ime, opis, postopek, today, ocena, cas, up_id])
+    print("RECEPT DODAN!")
+
+    #priloznost, priprava, vrsta, poiščemo in če ne obstaja dodamo
+    #vrsta
+    vrs = vrsta1.split(",")
+    for vrsta in vrs:
+        vrsta = vrsta.strip().lower()
+        print(vrsta)
+        cur.execute("SELECT id FROM vrsta WHERE ime = %s", [vrsta])
+        vrst_id = cur.fetchall()
+        print(vrst_id)
+        if vrst_id == []:
+            cur.execute("INSERT INTO vrsta(ime) VALUES (%s) RETURNING id", [vrsta])
+            [vrst_id] = cur.fetchone()
+            vrst_id = int(vrst_id)
+        else:
+            vrst_id = int(vrst_id[0][0])
+        print(vrst_id)
+        cur.execute("INSERT INTO vrsta_recepta(recept, vrsta) VALUES (%s, %s)", 
+                    [recept_id, vrst_id])
+    #priprava
+    prip_pom = priprava1.split(",")
+    for priprava in prip_pom:
+        priprava = priprava.strip().lower()
+        cur.execute("SELECT id FROM priprava WHERE ime = %s", [priprava])
+        prip_id = cur.fetchall()
+        if prip_id == []:
+            cur.execute("INSERT INTO priprava(ime) VALUES (%s) RETURNING id", [priprava])
+            [prip_id] = cur.fetchone()
+            prip_id = int(prip_id)
+        else: 
+            prip_id = int(prip_id[0][0])
+        cur.execute("INSERT INTO priprava_recepta(recept, priprava) VALUES (%s, %s)", 
+                    [recept_id, prip_id])
+    #priloznost
+    prilo = priloznost1.split(",")
+    for priloznost in prilo:
+        priloznost = priloznost.strip().lower()
+        cur.execute("SELECT id FROM priloznost WHERE  ime = %s", [priloznost])
+        pril_id = cur.fetchall()
+        if pril_id == []:
+            cur.execute("INSERT INTO priloznost(ime) VALUES (%s) RETURNING id", [priloznost])
+            [pril_id] = cur.fetchone()
+            pril_id = int(pril_id)
+        else:
+            pril_id = int(pril_id[0][0])
+        cur.execute("INSERT INTO priloznost_recepta(recept, priloznost) VALUES (%s, %s)", 
+                    [recept_id, pril_id])
+    print("VRSTA; PRIP; PRIL DODANE!")
+    #sestavine 
+    sest = request.forms.sestavine
+    sestavine = sest.split(",")
+    for el in sestavine:
+        ena_sest = el.split(":")
+        ime_sest = ena_sest[0].strip().lower()
+        kolicina = int(ena_sest[1])
+        enota = ena_sest[2].strip().lower()
+        cur.execute("SELECT id FROM sestavina WHERE ime = %s", [ime_sest])
+        sest_id = cur.fetchall()
+        if sest_id == []:
+            print("DODAJAM SESTAVINO V BAZO")
+            cur.execute("INSERT INTO sestavina(ime) VALUES (%s) RETURNING id", [ime_sest])
+            [sest_id]  = cur.fetchone()
+            sest_id = int(sest_id)
+        else:
+            sest_id = int(sest_id[0][0])
+        cur.execute("INSERT INTO vsebuje(recept,sestavina,kolicina,enota) VALUES (%s, %s, %s, %s)",
+                    [recept_id, sest_id, kolicina, enota])
+    print("SESTAVINE DODANE!")
+
+    
     #če dodaš recept se ti poveča skor
     #iz baze preberemo skor uporabnika
     cur.execute("SELECT skor FROM uporabnik WHERE ime=%s", [username])
@@ -436,9 +514,9 @@ def isci_post():
     if len(sestavine) == 0:
         isci_sest = ""
     else:
-        isci_sest = "AND LOWER sestavina.ime = '{}'".format(str(sestavine[0]).strip(). lower())
+        isci_sest = "AND  sestavina.ime = '{}'".format(str(sestavine[0]).strip().lower())
         for i in sestavine[1:]:
-            isci_sest += " OR LOWER sestavina.ime = '{}'".format(str(i).strip().LOWWER)
+            isci_sest += " OR  sestavina.ime = '{}'".format(str(i).strip().lower())
 
     #iskanje 
     cur.execute(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
@@ -500,7 +578,6 @@ def recept(x):
     priprava = request.forms.priprava
     priloznost = request.forms.priloznost
     vrsta = request.forms.vrsta
-    print(priprava)
     if priprava:
         cur.execute(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
         "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
@@ -561,7 +638,6 @@ def ocena(x):
     """oceni recept"""
     username = get_user()
     ocenjeno = request.forms.ocena
-    print(ocenjeno)
     ocenjeno = float(ocenjeno)
     cur.execute("SELECT ocena FROM recept WHERE id = %s", [int(x)])
     [[ocena]] = cur.fetchall()
@@ -599,7 +675,6 @@ def profil(x):
         skor = st_receptov
     cur.execute("SELECT ocena FROM recept JOIN uporabnik ON uporabnik.id = recept.uporabnik WHERE uporabnik.id=%s", [int(x)])
     vse_ocene = cur.fetchall()
-    print(vse_ocene)
     povp_ocena = 0
     nenicelne = 0
     for ocena in vse_ocene:
