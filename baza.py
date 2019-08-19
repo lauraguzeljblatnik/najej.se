@@ -339,9 +339,9 @@ def dodajrecept_post():
     ime = request.forms.ime_recepta
     cur.execute("SELECT COUNT(*) FROM recept WHERE ime = %s", [ime])
     [[st_rec]] = cur.fetchall()
-   # if st_rec != 0:
-    #    opozorilo = "Recept s takim imenom že obstaja!"
-     #   return template("dodajrecept.html", username = username, opozorilo = opozorilo)
+    if st_rec != 0:
+        opozorilo = "Recept s takim imenom že obstaja!"
+        return template("dodajrecept.html", username = username, opozorilo = opozorilo)
     opis = request.forms.opis
     priprava1 = request.forms.nacin_priprave
     priloznost1 = request.forms.priloznost
