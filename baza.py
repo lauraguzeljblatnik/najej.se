@@ -153,7 +153,6 @@ def recepti():
             moznosti_razvrscanje = razvrsti_recepte, st_na_stran = 3, moznosti_stran = st_stran,
             st_strani = 1 )
 
-#št receptov na stran, to naredi!!!
 @post("/recepti")
 def recepti_post():
     username = get_user()
@@ -162,9 +161,6 @@ def recepti_post():
     raz = int(raz)
     cur.execute("SELECT * FROM recept ORDER BY " + razvrsti_recepte[raz][1])
     recept = cur.fetchall()
-    #st receptov na stran
-    #TO DO, to še ne dela!!!!
-
     return template('recepti.html', username = username, recept = recept,
              razvrsti = raz, moznosti_razvrscanje = razvrsti_recepte, st_na_stran = 3, moznosti_stran = st_stran) 
 
@@ -262,10 +258,10 @@ def profil():
 def profil_post():
     username = get_user()
         #iskanje 
-    cur.execute(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
+    cur.execute("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime, recept.ocena, recept.cas FROM recept "
         "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
-        "WHERE (uporabnik.ime) = '{}' "
-        "ORDER BY id DESC").format(username))
+        "WHERE (uporabnik.ime) = %s "
+        "ORDER BY id DESC", [username])
     recept = cur.fetchall()
     sporocilo = None
     if recept == []:
@@ -330,7 +326,6 @@ def dodajrecept():
     return template("dodajrecept.html", username = username, opozorilo = None)
 
 
-##dopolni!! Ugotovi kako bi vnesle setavine???
 @post("/dodajrecept")
 def dodajrecept_post():
     username = get_user()
@@ -359,32 +354,36 @@ def dodajrecept_post():
     cur.execute("SELECT id FROM recept ORDER BY id DESC LIMIT 1")
     [[re]] = cur.fetchall()
     recept_id =  int(re) + 1
-    print([recept_id, ime, opis, postopek, today, ocena, cas, up_id])
-    #cur.execute("INSERT INTO recept (id, ime, opis, postopek, datum_objave, ocena, cas, uporabnik) VALUES (%s,%s, %s, %s, %s, %s, %s, %s)",
-    #               [recept_id, ime, opis, postopek, today, ocena, cas, up_id])
-    print("RECEPT DODAN!")
+    #print([recept_id, ime, opis, postopek, today, ocena, cas, up_id])
+    cur.execute("INSERT INTO recept (id, ime, opis, postopek, datum_objave, ocena, cas, uporabnik) VALUES (%s,%s, %s, %s, %s, %s, %s, %s)",
+                   [recept_id, ime, opis, postopek, today, ocena, cas, up_id])
+    #print("RECEPT DODAN!")
 
     #priloznost, priprava, vrsta, poiščemo in če ne obstaja dodamo
     #vrsta
     vrs = vrsta1.split(",")
     for vrsta in vrs:
+        if vrsta == "":
+            break
         vrsta = vrsta.strip().lower()
-        print(vrsta)
+        #print(vrsta)
         cur.execute("SELECT id FROM vrsta WHERE ime = %s", [vrsta])
         vrst_id = cur.fetchall()
-        print(vrst_id)
+        #print(vrst_id)
         if vrst_id == []:
             cur.execute("INSERT INTO vrsta(ime) VALUES (%s) RETURNING id", [vrsta])
             [vrst_id] = cur.fetchone()
             vrst_id = int(vrst_id)
         else:
             vrst_id = int(vrst_id[0][0])
-        print(vrst_id)
+        #print(vrst_id)
         cur.execute("INSERT INTO vrsta_recepta(recept, vrsta) VALUES (%s, %s)", 
                     [recept_id, vrst_id])
     #priprava
     prip_pom = priprava1.split(",")
     for priprava in prip_pom:
+        if priprava == "":
+            break
         priprava = priprava.strip().lower()
         cur.execute("SELECT id FROM priprava WHERE ime = %s", [priprava])
         prip_id = cur.fetchall()
@@ -398,7 +397,10 @@ def dodajrecept_post():
                     [recept_id, prip_id])
     #priloznost
     prilo = priloznost1.split(",")
+    #print(prilo)
     for priloznost in prilo:
+        if priloznost == "":
+            break
         priloznost = priloznost.strip().lower()
         cur.execute("SELECT id FROM priloznost WHERE  ime = %s", [priloznost])
         pril_id = cur.fetchall()
@@ -422,7 +424,7 @@ def dodajrecept_post():
         cur.execute("SELECT id FROM sestavina WHERE ime = %s", [ime_sest])
         sest_id = cur.fetchall()
         if sest_id == []:
-            print("DODAJAM SESTAVINO V BAZO")
+            #print("DODAJAM SESTAVINO V BAZO")
             cur.execute("INSERT INTO sestavina(ime) VALUES (%s) RETURNING id", [ime_sest])
             [sest_id]  = cur.fetchone()
             sest_id = int(sest_id)
@@ -430,9 +432,8 @@ def dodajrecept_post():
             sest_id = int(sest_id[0][0])
         cur.execute("INSERT INTO vsebuje(recept,sestavina,kolicina,enota) VALUES (%s, %s, %s, %s)",
                     [recept_id, sest_id, kolicina, enota])
-    print("SESTAVINE DODANE!")
+    #print("SESTAVINE DODANE!")
 
-    
     #če dodaš recept se ti poveča skor
     #iz baze preberemo skor uporabnika
     cur.execute("SELECT skor FROM uporabnik WHERE ime=%s", [username])
@@ -441,6 +442,7 @@ def dodajrecept_post():
     #skor povečamo za 1
     novi_skor = skor+1
     cur.execute("UPDATE uporabnik SET skor=%s WHERE ime = %s", [novi_skor, username])
+    conn.commit()
     redirect("/")
 
 @get("/isci")
@@ -452,11 +454,9 @@ def isci():
     vse_priloznosti = cur.fetchall()
     cur.execute("SELECT ime FROM priprava")
     vse_priprave = cur.fetchall()
-
     return template("isci.html", username = username, mozni_casi = mozni_casi, vse_vrste = vse_vrste,
             vse_priloznosti = vse_priloznosti, vse_priprave = vse_priprave, moznosti_razvrscanje = razvrsti_recepte, razvrsti = 0)
 
-#to tudi še ne dela
 @post("/isci")
 def isci_post():
     username = get_user()
@@ -467,77 +467,77 @@ def isci_post():
     cas1 = request.forms.cas
     if (cas1) in ['0','1','2','3']:
         cas = mozni_casi[int(cas1)][1]
-
     else:
         cas = '0 AND 999999999999'
         #razvrscanje 
     raz = request.forms.razvrsti
     raz = int(raz)
     sporocilo = None
+
+    pogoji = ["recept.ime ILIKE '%%'||%s||'%%'", # ILIKE ignorira velikost črk
+          "uporabnik.ime ILIKE '%%'||%s||'%%'", # procenti morajo biti podvojeni
+          "ocena >= %s"]
+    podatki = [naslov, avtor, ocena]
     
     ##vrsta
     vrsta1 = request.forms.getall('vrsta')
     vrsta = [(int(i) + 1) for i in vrsta1]
     st_vrst = len(vrsta)
-    if st_vrst == 0:
-        isci_vrsta = ""
-    else:    
-        isci_vrsta = "AND vrsta_recepta.vrsta = " + str(vrsta[0])
-        for i in range(1,len(vrsta)):
-            isci_vrsta += " OR vrsta_recepta.vrsta = " + str(vrsta[i])
-
+    if st_vrst > 0:
+        pogoji.append("({})".format(" OR ".join(["vrsta_recepta.vrsta = %s"] * st_vrst)))
+        podatki += vrsta
+    
     ##priloznost
     priloznost1 = request.forms.getall('priloznost')
     priloznost = [(int(i) + 1) for i in priloznost1]
     st_pril = len(priloznost)
-    if st_pril == 0:
-        isci_pril = ""
-    else:
-        isci_pril = "AND priloznost_recepta.priloznost = " + str(priloznost[0])
-        for i in range(1,len(priloznost)):
-            isci_pril += " OR priloznost_recepta.priloznost = " + str(priloznost[i])
+    if st_pril > 0:
+        pogoji.append("({})".format(" OR ".join(["priloznost_recepta.priloznost = %s"] * st_pril)))
+        podatki += priloznost
 
     ##priprava
     priprava1 = request.forms.getall('priprava')
     priprava = [(int(i) + 1) for i in priprava1]
     st_prip = len(priprava)
-    if st_prip == 0:
-        isci_prip = ""
-    else:
-        isci_prip = "AND priprava_recepta.priprava = " + str(priprava[0])
-        for i in range(1,len(priprava)):
-            isci_prip += " OR priprava_recepta.priprava = " + str(priprava[i])
-
+    if st_prip > 0:
+        pogoji.append("({})".format(" OR ".join(["priprava_recepta.priprava = %s"] * st_prip)))
+        podatki += priprava
+   
     #sestavine
     sest1 = request.forms.sestavine.lower()
-    sestavine = sest1.split(',')
-    if len(sestavine) == 0:
-        isci_sest = ""
+    if sest1 != '':
+        sestavine = sest1.split(',')
     else:
-        isci_sest = "AND  sestavina.ime = '{}'".format(str(sestavine[0]).strip().lower())
-        for i in sestavine[1:]:
-            isci_sest += " OR  sestavina.ime = '{}'".format(str(i).strip().lower())
-
-    #iskanje 
-    cur.execute(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
-        "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
-        "LEFT JOIN vrsta_recepta ON recept.id = vrsta_recepta.recept "
-        "LEFT JOIN priloznost_recepta ON recept.id = priloznost_recepta.recept "
-        "LEFT JOIN priprava_recepta ON recept.id = priprava_recepta.recept "
-        "JOIN vsebuje ON vsebuje.recept = recept.id "
-        "JOIN sestavina ON vsebuje.sestavina = sestavina.id "
-        "WHERE LOWER (recept.ime) LIKE '%'||'{}'||'%' "
-        "AND ocena >= {} "
-        "AND LOWER (uporabnik.ime) LIKE '%'||'{}'||'%' "
-        "AND cas BETWEEN {} "
-        "{} "
-        "{} "
-        "{} "
-        "{} "
-        "ORDER BY " + razvrsti_recepte[raz][1]).format(
-            naslov, ocena, avtor, cas, isci_vrsta, isci_pril, isci_prip, isci_sest))
-
+        sestavine = []
+        print("sestavine")
+    if len(sestavine) > 0:
+        pogoji.append("({})".format(" OR ".join(["sestavina.ime = %s"] * len(sestavine))))
+        podatki += sestavine
     
+    #iskanje 
+    cur.execute("""
+    SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime, recept.ocena, recept.cas
+    FROM recept JOIN uporabnik ON uporabnik.id = recept.uporabnik
+    LEFT JOIN vrsta_recepta ON recept.id = vrsta_recepta.recept
+    LEFT JOIN priloznost_recepta ON recept.id = priloznost_recepta.recept
+    LEFT JOIN priprava_recepta ON recept.id = priprava_recepta.recept
+    JOIN vsebuje ON vsebuje.recept = recept.id
+    JOIN sestavina ON vsebuje.sestavina = sestavina.id
+    WHERE {}
+    ORDER BY {}
+""".format(" AND ".join(pogoji), razvrsti_recepte[raz][1]), podatki)
+    
+    print("""
+    SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime, recept.ocena, recept.cas
+    FROM recept JOIN uporabnik ON uporabnik.id = recept.uporabnik
+    LEFT JOIN vrsta_recepta ON recept.id = vrsta_recepta.recept
+    LEFT JOIN priloznost_recepta ON recept.id = priloznost_recepta.recept
+    LEFT JOIN priprava_recepta ON recept.id = priprava_recepta.recept
+    JOIN vsebuje ON vsebuje.recept = recept.id
+    JOIN sestavina ON vsebuje.sestavina = sestavina.id
+    WHERE {}
+    ORDER BY {}
+""".format(" AND ".join(pogoji), razvrsti_recepte[raz][1]))
     recept = cur.fetchall()
 
     if recept == []:
@@ -578,27 +578,28 @@ def recept(x):
     priprava = request.forms.priprava
     priloznost = request.forms.priloznost
     vrsta = request.forms.vrsta
+    print(priprava)
     if priprava:
-        cur.execute(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
+        cur.execute("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime, recept.ocena, recept.cas FROM recept "
         "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
         "LEFT JOIN priprava_recepta ON recept.id = priprava_recepta.recept "
         "JOIN priprava ON priprava_recepta.priprava = priprava.id "
-        "WHERE priprava.ime = '{}' "
-        "ORDER BY id DESC").format(priprava))
+        "WHERE priprava.ime = %s "
+        "ORDER BY id DESC", [str(priprava)])
     if vrsta:
-        cur.execute(("SELECT DISTINCT recept.id, recept.ime,  opis, uporabnik.ime FROM recept "
+        cur.execute("SELECT DISTINCT recept.id, recept.ime,  opis, uporabnik.ime, recept.ocena, recept.cas FROM recept "
         "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
         "LEFT JOIN vrsta_recepta ON recept.id = vrsta_recepta.recept "
         "JOIN vrsta ON vrsta_recepta.vrsta = vrsta.id "
-        "WHERE vrsta.ime = '{}' "
-        "ORDER BY id DESC").format(vrsta))        
+        "WHERE vrsta.ime = %s "
+        "ORDER BY id DESC", [str(vrsta)])        
     if priloznost:
-        cur.execute(("SELECT DISTINCT recept.id, recept.ime,  opis, uporabnik.ime  FROM recept "
+        cur.execute("SELECT DISTINCT recept.id, recept.ime,  opis, uporabnik.ime, recept.ocena, recept.cas  FROM recept "
         "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
         "LEFT JOIN priloznost_recepta ON recept.id = priloznost_recepta.recept "
         " JOIN priloznost ON priloznost_recepta.priloznost = priloznost.id "
-        "WHERE priloznost.ime = '{}' "
-        "ORDER BY id DESC").format(priloznost))
+        "WHERE priloznost.ime = %s "
+        "ORDER BY id DESC", [str(priloznost)])
     recept = cur.fetchall()
     sporocilo = None
     #st vseh receptov
@@ -629,6 +630,7 @@ def komentar(x):
     #skor povečamo za 1
     novi_skor = skor+1
     cur.execute("UPDATE uporabnik SET skor=%s WHERE ime = %s", [novi_skor, username])
+    conn.commit()
     redirect("/recept/{0}".format(int(x)))
 
 
@@ -656,6 +658,7 @@ def ocena(x):
     #skor povečamo za 1
     novi_skor = skor+1
     cur.execute("UPDATE uporabnik SET skor=%s WHERE ime = %s", [novi_skor, username])
+    conn.commit()
     redirect("/recept/{0}".format(int(x)))
 
     
@@ -693,10 +696,10 @@ def profil(x):
 def profil_post(x):
     username = get_user()
     #iskanje 
-    cur.execute(("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime FROM recept "
+    cur.execute("SELECT DISTINCT recept.id, recept.ime, opis, uporabnik.ime, recept.ocena, recept.cas FROM recept "
         "JOIN uporabnik ON uporabnik.id = recept.uporabnik "
-        "WHERE (uporabnik.id) = '{}' "
-        "ORDER BY id DESC").format(x))
+        "WHERE (uporabnik.id) = %s "
+        "ORDER BY id DESC", [int(x)])
     recept = cur.fetchall()
     sporocilo = None
     if recept == []:
@@ -717,16 +720,10 @@ def profil_post(x):
 
 # priklopimo se na bazo
 conn = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password)
-conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemogočimo transakcije
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor) 
 
 # poženemo strežnik na portu 8080, glej http://localhost:8080/
 #dodaj na koncu reloader = True, sem izbirsala ker ni delalo
 run(host='localhost', port=8080)
 
-
-
-#TO DO:
-# dodaj recepti
-# recepti na stran, kako to narest, huda ideja drgač
 
