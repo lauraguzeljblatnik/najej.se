@@ -627,8 +627,8 @@ def komentar(x):
     cur.execute("SELECT skor FROM uporabnik WHERE ime=%s", [username])
     [[skor]] = cur.fetchall()
     skor = int(skor)
-    #skor povečamo za 1
-    novi_skor = skor+1
+    #skor povečamo za 2
+    novi_skor = skor+2
     cur.execute("UPDATE uporabnik SET skor=%s WHERE ime = %s", [novi_skor, username])
     conn.commit()
     redirect("/recept/{0}".format(int(x)))
@@ -655,8 +655,8 @@ def ocena(x):
     cur.execute("SELECT skor FROM uporabnik WHERE ime=%s", [username])
     [[skor]] = cur.fetchall()
     skor = int(skor)
-    #skor povečamo za 1
-    novi_skor = skor+1
+    #skor povečamo za 2
+    novi_skor = skor+2
     cur.execute("UPDATE uporabnik SET skor=%s WHERE ime = %s", [novi_skor, username])
     conn.commit()
     redirect("/recept/{0}".format(int(x)))
